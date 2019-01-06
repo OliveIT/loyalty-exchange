@@ -1,6 +1,6 @@
 [
 {
-  "model": "snippets.snippet",
+  "model": "services.service",
   "pk": 1,
   "fields": {
     "created": "2018-01-04T18:09:36.612Z",

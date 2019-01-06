@@ -4,9 +4,9 @@ echo "==> Removing all data from the database..."
 python manage.py flush --noinput
 
 echo "==> Loading user fixtures..."
-python manage.py loaddata snippets/fixtures/users.json
+python manage.py loaddata services/fixtures/users.json
 
-echo "==> Loading snippets fixtures..."
-python manage.py loaddata snippets/fixtures/snippets.json
+echo "==> Loading services fixtures..."
+python manage.py loaddata services/fixtures/services.json
 
 echo "==> Done!"

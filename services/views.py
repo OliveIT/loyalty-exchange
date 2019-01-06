@@ -4,28 +4,28 @@ from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from snippets.models import Snippet
-from snippets.permissions import IsOwnerOrReadOnly
-from snippets.serializers import SnippetSerializer, UserSerializer
+from services.models import Service
+from services.permissions import IsOwnerOrReadOnly
+from services.serializers import ServiceSerializer, UserSerializer
 
 
-class SnippetViewSet(viewsets.ModelViewSet):
+class ServiceViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
 
     Additionally we also provide an extra `highlight` action.
     """
-    queryset = Snippet.objects.all()
-    serializer_class = SnippetSerializer
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsOwnerOrReadOnly, )
 
     @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
-        snippet = self.get_object()
-        return Response(snippet.highlighted)
+        service = self.get_object()
+        return Response(service.highlighted)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
