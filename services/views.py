@@ -19,7 +19,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsAdminOrReadOnly, )
-
+    
     # @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
     # def highlight(self, request, *args, **kwargs):
     #     service = self.get_object()

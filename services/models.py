@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 # from pygments import highlight
 # from pygments.formatters.html import HtmlFormatter
 # from pygments.lexers import get_all_lexers, get_lexer_by_name
@@ -14,7 +16,7 @@ class Service(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
     description = models.TextField()
-    is_opened = models.BooleanField(default=False)
+    is_opened = models.BooleanField(default=True)
     service_type = models.CharField(
         choices=STYLE_CHOICES, default='airline', max_length=100)
     country = models.CharField(
@@ -24,7 +26,13 @@ class Service(models.Model):
     contact = models.TextField()
 
     #####
-    # subscribers = models.ManyToManyField(Genre)
+    players = models.ManyToManyField(
+            Player,
+            through='Membership',
+            through_fields=('team', 'player'))
+    is_active = models.BooleanField(default=True)
+    install_ts = models.DateTimeField(auto_now_add=True, blank=True)
+    update_ts = models.DateTimeField(auto_now_add=True, blank=True)
     #####
 
     class Meta:
@@ -42,3 +50,10 @@ class Service(models.Model):
         #     country=self.country, is_opened=is_opened, full=True, **options)
         # self.contact = highlight(self.description, lexer, formatter)
         super(Service, self).save(*args, **kwargs)
+
+class Membership(models.Model):
+    team = models.ForeignKey('Team')
+    player = models.ForeignKey('Player')
+    #date_of_joining = models.DateTimeField()
+    install_ts = models.DateTimeField(auto_now_add=True, blank=True)
+    update_ts = models.DateTimeField(auto_now_add=True, blank=True)
