@@ -5,13 +5,13 @@ from services.models import Service
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    # owner = serializers.ReadOnlyField(source='owner.username')
     # highlight = serializers.HyperlinkedIdentityField(
     #     view_name='service-highlight', format='html')
 
     class Meta:
         model = Service
-        fields = ('url', 'id', 'owner', 'title', 'description', #'highlight', 
+        fields = ('url', 'id', 'title', 'description', #'highlight', 'owner'
                   'is_opened', 'service_type', 'country')
 
 

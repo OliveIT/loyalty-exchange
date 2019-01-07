@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from services.models import Service
-from services.permissions import IsOwnerOrReadOnly
+from services.permissions import IsAdminOrReadOnly
 from services.serializers import ServiceSerializer, UserSerializer
 
 
@@ -18,7 +18,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     serializer_class = ServiceSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly, )
+        IsAdminOrReadOnly, )
 
     # @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
     # def highlight(self, request, *args, **kwargs):
@@ -26,8 +26,8 @@ class ServiceViewSet(viewsets.ModelViewSet):
     #     return Response(service.contact)
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
+        # serializer.save(owner=self.request.user)
+        serializer.save()
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """

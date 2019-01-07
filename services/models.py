@@ -19,9 +19,13 @@ class Service(models.Model):
         choices=STYLE_CHOICES, default='airline', max_length=100)
     country = models.CharField(
         choices=COUNTRY_CHOICES, default='US', max_length=100)
-    owner = models.ForeignKey(
-        'auth.User', related_name='services', on_delete=models.CASCADE)
+    # owner = models.ForeignKey(
+    #     'auth.User', related_name='services', on_delete=models.CASCADE)
     contact = models.TextField()
+
+    #####
+    # subscribers = models.ManyToManyField(Genre)
+    #####
 
     class Meta:
         ordering = ('created', )

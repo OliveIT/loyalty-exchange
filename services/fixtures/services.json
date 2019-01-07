@@ -9,7 +9,6 @@
     "is_opened": true,
     "service_type": "spa",
     "country": "FR",
-    "owner": 1,
     "contact": "123-123123"
   }
 },
@@ -23,7 +22,6 @@
     "is_opened": true,
     "service_type": "mart",
     "country": "UK",
-    "owner": 1,
     "contact": "543-15423"
   }
 },
@@ -37,7 +35,6 @@
     "is_opened": true,
     "service_type": "taxi",
     "country": "US",
-    "owner": 1,
     "contact": "345-21332"
   }
 }
