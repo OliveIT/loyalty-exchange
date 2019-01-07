@@ -22,10 +22,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsOwnerOrReadOnly, )
 
-    @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
-    def highlight(self, request, *args, **kwargs):
-        service = self.get_object()
-        return Response(service.highlighted)
+    # @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
+    # def highlight(self, request, *args, **kwargs):
+    #     service = self.get_object()
+    #     return Response(service.contact)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
