@@ -41,6 +41,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'services.apps.ServicesConfig',
+
+    # auth
+    'django.contrib.sites',
+
+    'rest_framework.authtoken',
+    'rest_auth',
+
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
@@ -99,22 +110,22 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME':
-        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME':
-        'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME':
-        'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME':
-        'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # {
+    #     'NAME':
+    #     'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    # {
+    #     'NAME':
+    #     'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # },
+    # {
+    #     'NAME':
+    #     'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    # {
+    #     'NAME':
+    #     'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
 ]
 
 # Internationalization
@@ -154,3 +165,28 @@ if ENVIRONMENT == 'production':
     SECURE_REDIRECT_EXEMPT = []
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+REST_SESSION_LOGIN = True
+
+SITE_ID = 1
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+# ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True   ## username based login
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USERNAME_REQUIRED = True
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'captainhook99999'
+EMAIL_HOST_PASSWORD = 'Hitman123123'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# SWAGGER_SETTINGS = {
+#     'LOGIN_URL': 'login',
+#     'LOGOUT_URL': 'logout',
+# }
