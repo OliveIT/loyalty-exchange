@@ -12,5 +12,33 @@
     "owner": 1,
     "contact": "123-123123"
   }
+},
+{
+  "model": "services.service",
+  "pk": 2,
+  "fields": {
+    "created": "2018-01-04T18:09:36.612Z",
+    "title": "super mart",
+    "description": " very good mart",
+    "is_opened": true,
+    "service_type": "mart",
+    "country": "UK",
+    "owner": 1,
+    "contact": "543-15423"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 3,
+  "fields": {
+    "created": "2018-01-01T18:09:36.612Z",
+    "title": "UBER",
+    "description": "awesome taxi service",
+    "is_opened": true,
+    "service_type": "taxi",
+    "country": "US",
+    "owner": 1,
+    "contact": "345-21332"
+  }
 }
 ]

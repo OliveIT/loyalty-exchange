@@ -4,8 +4,8 @@ from django.db import models
 # from pygments.lexers import get_all_lexers, get_lexer_by_name
 # from pygments.countrys import get_all_countrys
 
-STYLES = ['airline', 'mart', 'spa']
-COUNTRIES = ['US', 'CA', 'DE', 'FR']
+STYLES = ['airline', 'mart', 'spa', 'gym', 'taxi']
+COUNTRIES = ['US', 'CA', 'DE', 'FR', 'UK']
 STYLE_CHOICES = sorted([(item, item) for item in STYLES])
 COUNTRY_CHOICES = sorted((item, item) for item in COUNTRIES)
 

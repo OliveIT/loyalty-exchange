@@ -186,7 +186,7 @@ EMAIL_HOST_PASSWORD = 'Hitman123123'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# SWAGGER_SETTINGS = {
-#     'LOGIN_URL': 'login',
-#     'LOGOUT_URL': 'logout',
-# }
+SWAGGER_SETTINGS = {
+    'LOGIN_URL': '/api-auth/login',
+    'LOGOUT_URL': '/api-auth/logout',
+}

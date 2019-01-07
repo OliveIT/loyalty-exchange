@@ -1,0 +1,32 @@
+[
+  {
+    "model": "account.emailaddress",
+    "pk": 1,
+    "fields": {
+      "verified": 1,
+      "primary": 1,
+      "user_id": 2,
+      "email": "user1@example.com"
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 2,
+    "fields": {
+      "verified": 1,
+      "primary": 1,
+      "user_id": 3,
+      "email": "user2@example.com"
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 3,
+    "fields": {
+      "verified": 1,
+      "primary": 1,
+      "user_id": 3,
+      "email": "user3@example.com"
+    }
+  }
+]
