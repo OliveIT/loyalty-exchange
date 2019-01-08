@@ -24,16 +24,17 @@ class Service(models.Model):
     # owner = models.ForeignKey(
     #     'auth.User', related_name='services', on_delete=models.CASCADE)
     contact = models.TextField()
+    
+    subscribers = models.ManyToManyField(User)
 
     #####
-    customers = models.ManyToManyField(
-            User,
-            through='Membership',
-            through_fields=('service', 'customer'))
-    is_active = models.BooleanField(default=True)
-    install_ts = models.DateTimeField(auto_now_add=True)
-    update_ts = models.DateTimeField(auto_now_add=True)
-
+    # customers = models.ManyToManyField(
+    #         User,
+    #         through='Membership',
+    #         through_fields=('service', 'customer'))
+    # is_active = models.BooleanField(default=True)
+    # install_ts = models.DateTimeField(auto_now_add=True)
+    # update_ts = models.DateTimeField(auto_now_add=True)
     #####
 
     def __str__(self):
@@ -42,7 +43,7 @@ class Service(models.Model):
     class Meta:
         ordering = ('created', )
 
-    def save(self, *args, **kwargs):
+    # def save(self, *args, **kwargs):
         """
         Use the `pygments` library to create a contact HTML
         representation of the description service.
@@ -53,11 +54,12 @@ class Service(models.Model):
         # formatter = HtmlFormatter(
         #     country=self.country, is_opened=is_opened, full=True, **options)
         # self.contact = highlight(self.description, lexer, formatter)
-        super(Service, self).save(*args, **kwargs)
+
+        # super(Service, self).save(*args, **kwargs)
 
 class Membership(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    # service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    # customer = models.ForeignKey(User, on_delete=models.CASCADE)
     points = models.IntegerField(default=0)
     #date_of_joining = models.DateTimeField()
     install_ts = models.DateTimeField(auto_now_add=True, blank=True)

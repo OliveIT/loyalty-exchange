@@ -13,8 +13,9 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Service
         fields = ('url', 'id', 'title', 'description', #'highlight', 'owner'
-                  'is_opened', 'service_type', 'country')
+                  'is_opened', 'service_type', 'country', 'subscribers')
 
+    """
     @transaction.atomic
     def update(self, instance, validated_data):
         '''
@@ -69,6 +70,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError(
                     'memberships is not a list of objects'
                 )
+    """
 
 # class UserSerializer(serializers.HyperlinkedModelSerializer):
 #     services = serializers.HyperlinkedRelatedField(
@@ -78,10 +80,10 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
 #         model = User
 #         fields = ('url', 'id', 'username', 'services')
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+        fields = ('url', 'id',  'username', 'email', 'first_name', 'last_name')
 
 class MembershipSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='member.id')

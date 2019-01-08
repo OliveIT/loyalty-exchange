@@ -6,6 +6,9 @@ python manage.py flush --noinput
 echo "==> Loading user fixtures..."
 python manage.py loaddata services/fixtures/users.json
 
+echo "==> Loading user email fixtures..."
+python manage.py loaddata services/fixtures/account.emailaddress.json
+
 echo "==> Loading services fixtures..."
 python manage.py loaddata services/fixtures/services.json
 
