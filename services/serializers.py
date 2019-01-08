@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django.db import IntegrityError, transaction
 
 from services.models import Service, Membership
 
@@ -28,38 +29,39 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
             # base serializer class to update model fields
             validated_data.pop('memberships', None)
 
-        return super(TeamSerializer, self).update(instance, validated_data)
+        return super(ServiceSerializer, self).update(instance, validated_data)
 
 
     def _update_membership(self, instance, validated_data):
         '''
-        Update membership data for a team.
+        Update membership data for a service.
         '''
         memberships = self.initial_data.get('memberships')
-        if isinstance(membership, list) and len(memberships) >= 1:
+        ## typo??
+        if isinstance(memberships, list) and len(memberships) >= 1:
             # make a set of incoming membership
-            incoming_player_ids = set()
+            incoming_customer_ids = set()
 
             try:
                 for member in memberships:
-                    incoming_player_ids.add(member['id'])
+                    incoming_customer_ids.add(member['id'])
             except:
                 raise serializers.ValidationError(
                     'id is required field in memberships objects.'
                 )
 
             Membership.objects.filter(
-                team_id=instance.id
+                service_id=instance.id
             ).delete()
 
             # add merchant member mappings
             Membership.objects.bulk_create(
                 [
                     Membership(
-                        team_id=instance.id,
-                        player_id=player
+                        service_id=instance.id,
+                        customer_id=customer
                     )
-                    for player in incoming_player_ids
+                    for customer in incoming_customer_ids
                 ]
             )
             return instance
@@ -68,10 +70,23 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
                     'memberships is not a list of objects'
                 )
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    services = serializers.HyperlinkedRelatedField(
-        many=True, view_name='service-detail', read_only=True)
+# class UserSerializer(serializers.HyperlinkedModelSerializer):
+#     services = serializers.HyperlinkedRelatedField(
+#         many=True, view_name='service-detail', read_only=True)
 
+#     class Meta:
+#         model = User
+#         fields = ('url', 'id', 'username', 'services')
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'id', 'username', 'services')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+
+class MembershipSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='member.id')
+    name = serializers.ReadOnlyField(source='member.name')
+
+    class Meta:
+        model = Membership
+        fields = ('id', 'name', 'role')

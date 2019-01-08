@@ -26,14 +26,18 @@ class Service(models.Model):
     contact = models.TextField()
 
     #####
-    players = models.ManyToManyField(
-            Player,
+    customers = models.ManyToManyField(
+            User,
             through='Membership',
-            through_fields=('team', 'player'))
+            through_fields=('service', 'customer'))
     is_active = models.BooleanField(default=True)
-    install_ts = models.DateTimeField(auto_now_add=True, blank=True)
-    update_ts = models.DateTimeField(auto_now_add=True, blank=True)
+    install_ts = models.DateTimeField(auto_now_add=True)
+    update_ts = models.DateTimeField(auto_now_add=True)
+
     #####
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         ordering = ('created', )
@@ -52,8 +56,12 @@ class Service(models.Model):
         super(Service, self).save(*args, **kwargs)
 
 class Membership(models.Model):
-    team = models.ForeignKey('Team')
-    player = models.ForeignKey('Player')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    points = models.IntegerField(default=0)
     #date_of_joining = models.DateTimeField()
     install_ts = models.DateTimeField(auto_now_add=True, blank=True)
     update_ts = models.DateTimeField(auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.service.title + ' ' + self.customer.username + ' ' + self.points + ' pts'
