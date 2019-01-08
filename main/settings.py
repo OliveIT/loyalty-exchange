@@ -99,8 +99,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'wajesmart',
-        'USER': 'superdev',
-        'PASSWORD': 'secret',
+        'USER': 'root',
+        'PASSWORD': 'hitman',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
@@ -187,6 +187,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 SWAGGER_SETTINGS = {
-    'LOGIN_URL': '/api-auth/login',
-    'LOGOUT_URL': '/api-auth/logout',
+    'LOGIN_URL': '/rest-urls/login',
+    'LOGOUT_URL': '/rest-urls/logout',
 }

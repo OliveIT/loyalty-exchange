@@ -67,3 +67,8 @@ class Membership(models.Model):
 
     def __str__(self):
         return self.service.title + ' ' + self.customer.username + ' ' + self.points + ' pts'
+
+class CurrencyRate(models.Model):
+    currency = models.CharField(default='USD', max_length=100)
+    rate = models.CharField(default='1', max_length=100)
+    updated_ts = models.DateTimeField(auto_now_add=True, blank=True)

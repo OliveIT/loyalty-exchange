@@ -4,10 +4,12 @@ from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from services.models import Service
+from services.models import Service, CurrencyRate
 from services.permissions import IsAdminOrReadOnly
-from services.serializers import ServiceSerializer, UserSerializer
+from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer
 
+import json
+import requests
 
 class ServiceViewSet(viewsets.ModelViewSet):
     """
@@ -36,3 +38,26 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset gives up-to-date currency rates
+    """
+    # queryset = User.objects.all()
+    # serializer_class = UserSerializer
+
+    queryset = CurrencyRate.objects.all()
+    serializer_class = CurrencyRateSerializer
+
+    def get_rate(self, currency):
+        url = 'http://free.currencyconverterapi.com/api/v5/convert?q=' + currency + '_USD&compact=y' 
+        r = requests.get(url)
+        items = r.json()
+        return items[currency + '_USD']['val']
+
+    def list(self, request):
+        supported_currencies = ['NGN', 'EUR', 'GBP', 'CNY', 'AUD']
+        rates = {}
+        for cur in supported_currencies:
+            rates[cur] = self.get_rate(cur)
+        return Response(data=rates)

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.db import IntegrityError, transaction
 
-from services.models import Service, Membership
+from services.models import Service, Membership, CurrencyRate
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
@@ -84,6 +84,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'id',  'username', 'email', 'first_name', 'last_name')
+
+class CurrencyRateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CurrencyRate
+        fields = ('id',  'currency', 'rate' )
 
 class MembershipSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='member.id')
