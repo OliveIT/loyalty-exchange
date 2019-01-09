@@ -32,7 +32,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -50,8 +49,11 @@ INSTALLED_APPS = [
 
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     'rest_auth.registration',
     'rest_framework_swagger',
+
+    'django.contrib.admin',
 ]
 
 MIDDLEWARE = [
@@ -181,8 +183,8 @@ ACCOUNT_EMAIL_REQUIRED = True   ## username based login
 ACCOUNT_USERNAME_REQUIRED = True
 
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'captainhook99999'
-EMAIL_HOST_PASSWORD = 'Hitman123123'
+EMAIL_HOST_USER = 'captainheart'
+EMAIL_HOST_PASSWORD = 'CaptainHook1'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

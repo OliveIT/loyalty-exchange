@@ -12,8 +12,8 @@ API_DESCRIPTION = 'A Web API for Loyalty Exchange.'
 schema_view = get_schema_view(title=API_TITLE)
 
 urlpatterns = [
+    url(r'^', include('django.contrib.auth.urls')), #hotfix
     url(r'^', include('services.urls')),
-    url(r'^admin/', admin.site.urls),
 
     url(r'^rest-urls/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^schema/$', schema_view),
@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^auth/registration/', include('rest_auth.registration.urls')),
     url(r'^account/', include('allauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
+
+    url(r'^admin/', admin.site.urls),
 ]
