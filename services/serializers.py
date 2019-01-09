@@ -1,8 +1,39 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.response import Response
 from django.db import IntegrityError, transaction
-
 from services.models import Service, Membership, CurrencyRate
+from rest_auth.serializers import UserDetailsSerializer
+
+class UserSerializer(UserDetailsSerializer):
+
+    company_name = serializers.CharField(source="userprofile.company_name")
+    phone = serializers.CharField(source="userprofile.phone")
+
+    class Meta(UserDetailsSerializer.Meta):
+        fields = UserDetailsSerializer.Meta.fields + ('company_name','phone')
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('userprofile', {})
+        company_name = profile_data.get('company_name')
+        phone = profile_data.get('phone')
+
+        instance = super(UserSerializer, self).update(instance, validated_data)
+
+        # get and update user profile
+        profile = instance.userprofile
+        if profile_data:
+            if company_name:
+                profile.company_name = company_name
+            if phone:
+                profile.phone = phone
+            profile.save()
+        return instance
+
+    def destroy(self, request, pk=None, **kwargs):
+        request.user.is_active = False
+        request.user.save()
+        return Response(status=204)
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
@@ -80,10 +111,10 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
 #         model = User
 #         fields = ('url', 'id', 'username', 'services')
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'id',  'username', 'email', 'first_name', 'last_name')
+# class UserSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('url', 'id',  'username', 'email', 'first_name', 'last_name')
 
 class CurrencyRateSerializer(serializers.ModelSerializer):
     class Meta:
