@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from services.models import Service, CurrencyRate
+from services.models import Service, CurrencyRate, UserProfile,Membership
 from services.permissions import IsAdminOrReadOnly
-from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer
+from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer,ProfileSerializer,MembershipSerializer
 
 import json
 import requests
@@ -39,6 +39,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list` and `detail` actions.
+    """
+    queryset = UserProfile.objects.all()
+    serializer_class = ProfileSerializer
+
+class MembershipViewSet(viewsets.ModelViewSet):
+    queryset = Membership.objects.all()
+    serializer_class = MembershipSerializer
+    
 class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
     """
     This viewset gives up-to-date currency rates

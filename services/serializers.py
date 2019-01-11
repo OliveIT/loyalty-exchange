@@ -2,13 +2,13 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.response import Response
 from django.db import IntegrityError, transaction
-from services.models import Service, Membership, CurrencyRate
+from services.models import Service, Membership, CurrencyRate,UserProfile
 from rest_auth.serializers import UserDetailsSerializer
 
 class UserSerializer(UserDetailsSerializer):
 
-    company_name = serializers.CharField(source="userprofile.company_name")
-    phone = serializers.CharField(source="userprofile.phone")
+    # company_name = serializers.CharField(source="userprofile.company_name")
+    # phone = serializers.CharField(source="userprofile.phone")
 
     class Meta(UserDetailsSerializer.Meta):
         fields = UserDetailsSerializer.Meta.fields + ('company_name','phone')
@@ -17,7 +17,7 @@ class UserSerializer(UserDetailsSerializer):
         profile_data = validated_data.pop('userprofile', {})
         company_name = profile_data.get('company_name')
         phone = profile_data.get('phone')
-
+        ## initialize super base class
         instance = super(UserSerializer, self).update(instance, validated_data)
 
         # get and update user profile
@@ -35,6 +35,12 @@ class UserSerializer(UserDetailsSerializer):
         request.user.save()
         return Response(status=204)
 
+# class UserProfileSerializer(serializers.HyperlinkedModelSerializer)
+#     class Meta:
+#         model = Service
+#         fields = ('url', 'id', 'title', 'description', #'highlight', 'owner'
+#                   'is_opened', 'service_type', 'country', 'subscribers')
+
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
     # owner = serializers.ReadOnlyField(source='owner.username')
@@ -44,7 +50,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Service
         fields = ('url', 'id', 'title', 'description', #'highlight', 'owner'
-                  'is_opened', 'service_type', 'country', 'subscribers')
+                  'is_opened', 'service_type', 'country' )#, 'subscribers')
 
     """
     @transaction.atomic
@@ -122,9 +128,70 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         fields = ('id',  'currency', 'rate' )
 
 class MembershipSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='member.id')
-    name = serializers.ReadOnlyField(source='member.name')
-
     class Meta:
         model = Membership
-        fields = ('id', 'name', 'role')
+        fields = '__all__'
+
+class ProfileSerializer(serializers.ModelSerializer):
+    services = ServiceSerializer(many=True)
+    memberships = MembershipSerializer(many=True,write_only=True)
+    class Meta:
+        model = UserProfile
+        fields = ('company_name','phone','is_active','services','memberships')
+        depth = 1
+
+    def update(self, instance, validated_data):
+        '''
+        Cutomize the update function for the serializer to update the
+        related_field values.
+        '''
+        membership_data = validated_data.get('services')
+        profile = instance
+        memberships = profile.memberships
+        print(memberships)
+        if 'memberships' in validated_data:
+            instance = self._update_membership(instance, validated_data)
+
+            # remove memberships key from validated_data to use update method of
+            # base serializer class to update model fields
+            validated_data.pop('memberships', None)
+
+        return super(ProfileSerializer, self).update(instance, validated_data)
+
+    # def _update_membership(self, instance, validated_data):
+    #     '''
+    #     Update membership data for a service.
+    #     '''
+    #     memberships = self.initial_data.get('memberships')
+    #     ## typo??
+    #     if isinstance(memberships, list) and len(memberships) >= 1:
+    #         # make a set of incoming membership
+    #         incoming_service_ids = set()
+
+    #         try:
+    #             for member in memberships:
+    #                 incoming_customer_ids.add(member['id'])
+    #         except:
+    #             raise serializers.ValidationError(
+    #                 'id is required field in memberships objects.'
+    #             )
+
+    #         Membership.objects.filter(
+    #             service_id=instance.id
+    #         ).delete()
+
+    #         # add merchant member mappings
+    #         Membership.objects.bulk_create(
+    #             [
+    #                 Membership(
+    #                     service_id=instance.id,
+    #                     customer_id=customer
+    #                 )
+    #                 for customer in incoming_customer_ids
+    #             ]
+    #         )
+    #         return instance
+    #     else:
+    #         raise serializers.ValidationError(
+    #                 'memberships is not a list of objects'
+    #             )

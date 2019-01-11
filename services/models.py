@@ -3,67 +3,23 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 
-class UserProfile(models.Model):
-    ## FIXME on_delete really required?
-    user = models.OneToOneField(User, primary_key=True, related_name='profile', on_delete=models.CASCADE)
-    # custom fields for user
-    company_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=100)
-
-@receiver(post_save, sender=User)
-def create_profile_for_user(sender, instance=None, created=False, **kwargs):
-    if created:
-        UserProfile.objects.get_or_create(user=instance)
-        print("########### create_profile_for_user")
-
-@receiver(pre_delete, sender=User)
-def delete_profile_for_user(sender, instance=None, **kwargs):
-    if instance:
-        user_profile = UserProfile.objects.get(user=instance)
-        user_profile.delete()
-        print("########### delete_profile_for_user")
-
-@receiver(post_save, sender=User)
-def create_profile_for_user(sender, instance=None, created=False, **kwargs):
-    if created:
-        UserProfile.objects.get_or_create(user=instance)
-        print("########### create_profile_for_user")
-
-# from pygments import highlight
-# from pygments.formatters.html import HtmlFormatter
-# from pygments.lexers import get_all_lexers, get_lexer_by_name
-# from pygments.countrys import get_all_countrys
-
 STYLES = ['airline', 'mart', 'spa', 'gym', 'taxi']
 COUNTRIES = ['US', 'CA', 'DE', 'FR', 'UK']
 STYLE_CHOICES = sorted([(item, item) for item in STYLES])
 COUNTRY_CHOICES = sorted((item, item) for item in COUNTRIES)
-
 
 class Service(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
     description = models.TextField()
     is_opened = models.BooleanField(default=True)
-    service_type = models.CharField(
-        choices=STYLE_CHOICES, default='airline', max_length=100)
-    country = models.CharField(
-        choices=COUNTRY_CHOICES, default='US', max_length=100)
+    service_type = models.CharField(choices=STYLE_CHOICES, default='airline', max_length=100)
+    country = models.CharField(choices=COUNTRY_CHOICES, default='US', max_length=100)
     # owner = models.ForeignKey(
     #     'auth.User', related_name='services', on_delete=models.CASCADE)
     contact = models.TextField()
     
-    subscribers = models.ManyToManyField(User)
-
-    #####
-    # customers = models.ManyToManyField(
-    #         User,
-    #         through='Membership',
-    #         through_fields=('service', 'customer'))
-    # is_active = models.BooleanField(default=True)
-    # install_ts = models.DateTimeField(auto_now_add=True)
-    # update_ts = models.DateTimeField(auto_now_add=True)
-    #####
+    # subscribers = models.ManyToManyField(User)
 
     def __str__(self):
         return self.title
@@ -85,16 +41,61 @@ class Service(models.Model):
 
         # super(Service, self).save(*args, **kwargs)
 
+
+class UserProfile(models.Model):
+    ## FIXME on_delete really required?
+    user = models.OneToOneField(User, primary_key=True, related_name='profile', on_delete=models.CASCADE)
+    # custom fields for user
+    company_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=100)
+
+    #####
+    services = models.ManyToManyField(
+        Service,
+        through='Membership',
+        # through_fields=('profile', 'service'),
+        # related_name='members'
+    )
+    is_active = models.BooleanField(default=True)
+    # install_ts = models.DateTimeField(auto_now_add=True)
+    # update_ts = models.DateTimeField(auto_now_add=True)
+    #####
+
+    def __str__(self):
+        return self.user.username + ' at ' + self.company_name ;
+
+@receiver(post_save, sender=User)
+def create_profile_for_user(sender, instance=None, created=False, **kwargs):
+    if created:
+        UserProfile.objects.get_or_create(user=instance)
+        print("########### create_profile_for_user")
+
+@receiver(pre_delete, sender=User)
+def delete_profile_for_user(sender, instance=None, **kwargs):
+    if instance:
+        user_profile = UserProfile.objects.get(user=instance)
+        user_profile.delete()
+        print("########### delete_profile_for_user")
+
+@receiver(post_save, sender=User)
+def create_profile_for_user(sender, instance=None, created=False, **kwargs):
+    if created:
+        UserProfile.objects.get_or_create(user=instance)
+        print("########### create_profile_for_user")
+
+
 class Membership(models.Model):
-    # service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    # customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)#, related_name='membership')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)#, related_name='membership')
+
     points = models.IntegerField(default=0)
+    identifier = models.CharField(max_length=100, blank=True, default='')
     #date_of_joining = models.DateTimeField()
     install_ts = models.DateTimeField(auto_now_add=True, blank=True)
     update_ts = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.service.title + ' ' + self.customer.username + ' ' + self.points + ' pts'
+        return self.service.title + ' ' + self.profile.username + ' ' + self.points + ' pts'
 
 class CurrencyRate(models.Model):
     currency = models.CharField(default='USD', max_length=100)
