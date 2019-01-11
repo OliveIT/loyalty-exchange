@@ -22,6 +22,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         # IsAdminOrReadOnly,
     )
+
+    def get_queryset(self):
+        queryset = Service.objects.all()
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title__startswith=title)
+        return queryset
     
     # @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
     # def highlight(self, request, *args, **kwargs):
