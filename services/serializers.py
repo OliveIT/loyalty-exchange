@@ -7,11 +7,11 @@ from rest_auth.serializers import UserDetailsSerializer
 
 class UserSerializer(UserDetailsSerializer):
 
-    # company_name = serializers.CharField(source="userprofile.company_name")
-    # phone = serializers.CharField(source="userprofile.phone")
+    # company_name = serializers.CharField(source="profile.company_name")
+    # phone = serializers.CharField(source="profile.phone")
 
     class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields + ('company_name','phone')
+        fields = UserDetailsSerializer.Meta.fields # + ('company_name','phone')
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('userprofile', {})
@@ -127,17 +127,23 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         model = CurrencyRate
         fields = ('id',  'currency', 'rate' )
 
-class MembershipSerializer(serializers.ModelSerializer):
+class MembershipSerializer(serializers.HyperlinkedModelSerializer):
+    # service = ServiceSerializer()   # to inlude details of service
     class Meta:
         model = Membership
-        fields = '__all__'
+        # fields = '__all__'
+        fields = ('url', 'identifier', 'points', 'profile', 'service' )
+
 
 class ProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.ReadOnlyField(source='user.id')
+    username = serializers.ReadOnlyField(source='user.username')
+    email = serializers.ReadOnlyField(source='user.email')
     services = ServiceSerializer(many=True)
-    memberships = MembershipSerializer(many=True,write_only=True)
+    memberships = MembershipSerializer(source='membership', many=True, write_only=True)
     class Meta:
         model = UserProfile
-        fields = ('company_name','phone','is_active','services','memberships')
+        fields = ('user_id','username','email', 'company_name','phone','is_active', 'memberships', 'services')
         depth = 1
 
     def update(self, instance, validated_data):

@@ -85,7 +85,7 @@ def create_profile_for_user(sender, instance=None, created=False, **kwargs):
 
 
 class Membership(models.Model):
-    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)#, related_name='membership')
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='membership')
     service = models.ForeignKey(Service, on_delete=models.CASCADE)#, related_name='membership')
 
     points = models.IntegerField(default=0)

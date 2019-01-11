@@ -190,10 +190,13 @@ ACCOUNT_EMAIL_REQUIRED = True   ## username based login
 ACCOUNT_USERNAME_REQUIRED = True
 
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'captainheart'
-EMAIL_HOST_PASSWORD = 'CaptainHook1'
+EMAIL_HOST_USER = os.environ["SENDGRID_USER_NAME"]
+EMAIL_HOST_PASSWORD = os.environ["SENDGRID_PASSWORD"]
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+# must enter old password to change password
+OLD_PASSWORD_FIELD_ENABLED = True
 
 SWAGGER_SETTINGS = {
     'LOGIN_URL': '/rest-urls/login',
