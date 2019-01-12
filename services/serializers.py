@@ -139,8 +139,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source='user.id')
     username = serializers.ReadOnlyField(source='user.username')
     email = serializers.ReadOnlyField(source='user.email')
-    services = ServiceSerializer(many=True)
-    memberships = MembershipSerializer(source='membership', many=True, write_only=True)
+    services = ServiceSerializer(many=True, read_only=True)
+    memberships = MembershipSerializer(source='membership', many=True, read_only=True)
     class Meta:
         model = UserProfile
         fields = ('user_id','username','email', 'company_name','phone','is_active', 'memberships', 'services')

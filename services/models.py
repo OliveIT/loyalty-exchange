@@ -48,7 +48,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, primary_key=True, related_name='profile', on_delete=models.CASCADE)
     # custom fields for user
     company_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=100)
+    phone = models.CharField(max_length=100, unique=True, null=True)
 
     #####
     services = models.ManyToManyField(
