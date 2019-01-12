@@ -50,7 +50,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Service
         fields = ('url', 'id', 'title', 'description', #'highlight', 'owner'
-                  'is_opened', 'service_type', 'country' )#, 'subscribers')
+                  'service_type', 'country','is_opened', 'api_url' )#, 'subscribers')
 
     """
     @transaction.atomic
@@ -146,6 +146,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('user_id','username','email', 'company_name','phone','is_active', 'memberships', 'services')
         depth = 1
 
+"""
     def update(self, instance, validated_data):
         '''
         Cutomize the update function for the serializer to update the
@@ -163,7 +164,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             validated_data.pop('memberships', None)
 
         return super(ProfileSerializer, self).update(instance, validated_data)
-
+"""
     # def _update_membership(self, instance, validated_data):
     #     '''
     #     Update membership data for a service.

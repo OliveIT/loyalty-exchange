@@ -47,7 +47,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    """
+    """ 
     This viewset automatically provides `list` and `detail` actions.
     """
     queryset = UserProfile.objects.all()
@@ -56,6 +56,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class MembershipViewSet(viewsets.ModelViewSet):
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
+
+    def get_queryset(self):
+        queryset = Membership.objects.all()
+        user = self.request.query_params.get('user', None)
+        if user is not None:
+            queryset = queryset.filter(profile=user)
+        service = self.request.query_params.get('service', None)
+        if service is not None:
+            queryset = queryset.filter(service=service)
+        return queryset
     
 class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
     """

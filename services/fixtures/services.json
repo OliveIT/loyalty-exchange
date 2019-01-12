@@ -9,7 +9,8 @@
     "is_opened": true,
     "service_type": "spa",
     "country": "FR",
-    "contact": "123-123123"
+    "contact": "123-123123",
+    "api_url": "https://spa.com"
   }
 },
 {
@@ -22,7 +23,8 @@
     "is_opened": true,
     "service_type": "mart",
     "country": "UK",
-    "contact": "543-15423"
+    "contact": "543-15423",
+    "api_url": "https://mart.com"
   }
 },
 {
@@ -35,7 +37,8 @@
     "is_opened": true,
     "service_type": "taxi",
     "country": "US",
-    "contact": "345-21332"
+    "contact": "345-21332",
+    "api_url": "https://taxi.com"
   }
 }
 ]

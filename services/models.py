@@ -9,15 +9,16 @@ STYLE_CHOICES = sorted([(item, item) for item in STYLES])
 COUNTRY_CHOICES = sorted((item, item) for item in COUNTRIES)
 
 class Service(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=100, blank=True, default='')
+    title = models.CharField(max_length=100, blank=False, default='')
     description = models.TextField()
-    is_opened = models.BooleanField(default=True)
     service_type = models.CharField(choices=STYLE_CHOICES, default='airline', max_length=100)
     country = models.CharField(choices=COUNTRY_CHOICES, default='US', max_length=100)
+    is_opened = models.BooleanField(default=True)
     # owner = models.ForeignKey(
     #     'auth.User', related_name='services', on_delete=models.CASCADE)
     contact = models.TextField()
+    api_url = models.CharField(max_length=300, blank=False, default='')
+    created = models.DateTimeField(auto_now_add=True)
     
     # subscribers = models.ManyToManyField(User)
 
