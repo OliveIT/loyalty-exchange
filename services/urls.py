@@ -18,5 +18,6 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^getpoints', views_custom.GetPoints.as_view()),
     url(r'^redeempoints', views_custom.RedeemPoints.as_view()),
+    url(r'^totalpoints', views_custom.TotalPoints.as_view())
 ]
 

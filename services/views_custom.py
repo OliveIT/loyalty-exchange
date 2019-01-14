@@ -1,4 +1,6 @@
 from django.core import serializers
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from services.models import Service, UserProfile, Membership
 from services.serializers import ServiceSerializer, ProfileSerializer, MembershipSerializer
 from django.http import Http404
@@ -118,3 +120,22 @@ class RedeemPoints(APIView):
         else:
             error_msg['details'] = "user, service, identifer, password, positive amount fields are required!"
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+class TotalPoints(APIView):
+    """
+    Get a user's total points of all services.
+    """
+
+    def get(self, request, format=None):
+        # services = Service.objects.all()
+        # serializer = ServiceSerializer(services, many=True)
+        # return Response(serializer.data)
+        user = self.request.query_params.get('user', None)
+        if user is not None:
+            memberships = Membership.objects.filter(profile=user)
+            answer = {
+                "count" : memberships.count(),
+                "total": memberships.aggregate(sum=Coalesce(Sum('points'), 0))['sum']
+            }
+            return Response(answer)
+        return Response({"details": "no user specified!"}, status=status.HTTP_400_BAD_REQUEST)
