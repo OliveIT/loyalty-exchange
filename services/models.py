@@ -47,7 +47,8 @@ class UserProfile(models.Model):
     ## FIXME on_delete really required?
     user = models.OneToOneField(User, primary_key=True, related_name='profile', on_delete=models.CASCADE)
     # custom fields for user
-    company_name = models.CharField(max_length=100)
+    wallet = models.CharField(max_length=100, null=True)
+    company_name = models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=100, unique=True, null=True)
 
     #####

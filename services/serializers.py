@@ -143,7 +143,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     memberships = MembershipSerializer(source='membership', many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('user_id','username','email', 'company_name','phone','is_active', 'memberships', 'services')
+        fields = ('user_id','username','email', 'company_name', 'phone', 'wallet', 'is_active', 'memberships', 'services')
         depth = 1
 
 """

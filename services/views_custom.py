@@ -28,7 +28,7 @@ class GetPoints(APIView):
     #     services = Service.objects.all()
     #     serializer = ServiceSerializer(services, many=True)
     #     return Response(serializer.data)
-    
+
     def __init__(self):
         self.w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
         with open(str( os.getcwd() + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
@@ -38,8 +38,6 @@ class GetPoints(APIView):
             address=self.contract_address,
             abi=self.abi)
         self.concise = ConciseContract(self.contract)
-
-        self.mint_token(address="0x19CE8aB5734FF206C66aa7ff77D011E3EB367B6c", amount=100)
         pass
 
     def mint_token(self, address, amount):
@@ -72,10 +70,16 @@ class GetPoints(APIView):
                     if res.status_code == 200 or res.status_code == 201:
                         # success
                         retval = res.json()
+                        diff = retval['points'] - membership.points
+                        # if diff > 0:
+                        #     self.mint_token(address=membership.profile.wallet, amount=diff)
+
                         membership.points = retval['points']
                         if flag_save_id:
                             membership.identifier = identifier
                         membership.save()
+                        
+
                         retval = serializers.serialize('json', [ membership, ])
                         return Response(retval, status=status.HTTP_201_CREATED)
                     # error code
