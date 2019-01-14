@@ -5,6 +5,8 @@
 .*
 env
 /temp/**
+/truffle/build/**
+
 
 # Accept these files in the repository
 !.gitignore

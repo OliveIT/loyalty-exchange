@@ -9,6 +9,15 @@ from rest_framework.response import Response
 from rest_framework import status
 import requests
 import json
+import os, sys, inspect
+
+import web3
+
+from web3 import Web3
+from web3.contract import ConciseContract
+
+from web3.providers.eth_tester import EthereumTesterProvider
+from web3 import Web3
 
 class GetPoints(APIView):
     """
@@ -19,6 +28,25 @@ class GetPoints(APIView):
     #     services = Service.objects.all()
     #     serializer = ServiceSerializer(services, many=True)
     #     return Response(serializer.data)
+    
+    def __init__(self):
+        self.w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
+        with open(str( os.getcwd() + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
+            self.abi = json.load(abi_definition)['abi']
+        self.contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
+        self.contract = self.w3.eth.contract(
+            address=self.contract_address,
+            abi=self.abi)
+        self.concise = ConciseContract(self.contract)
+
+        self.mint_token(address="0x19CE8aB5734FF206C66aa7ff77D011E3EB367B6c", amount=100)
+        pass
+
+    def mint_token(self, address, amount):
+        # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
+        tx_hash = self.concise.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
+        self.w3.eth.waitForTransactionReceipt(tx_hash)
+        pass
 
     def post(self, request, format=None):
         user_id = request.data.get('user', None)
