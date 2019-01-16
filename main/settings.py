@@ -183,7 +183,7 @@ SITE_ID = 1
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 # ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True   ## username based login
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -201,4 +201,14 @@ OLD_PASSWORD_FIELD_ENABLED = True
 SWAGGER_SETTINGS = {
     'LOGIN_URL': '/rest-urls/login',
     'LOGOUT_URL': '/rest-urls/logout',
+}
+
+REST_AUTH_SERIALIZERS = {
+#     'REGISTER_SERIALIZER': 'services.serializers.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer'
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'services.serializers.CustomRegisterSerializer',
+    # 'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer'
 }

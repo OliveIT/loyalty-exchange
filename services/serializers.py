@@ -4,24 +4,25 @@ from rest_framework.response import Response
 from django.db import IntegrityError, transaction
 from services.models import Service, Membership, CurrencyRate,UserProfile
 from rest_auth.serializers import UserDetailsSerializer
+from rest_auth.registration.serializers import RegisterSerializer
 
 class UserSerializer(UserDetailsSerializer):
 
-    # company_name = serializers.CharField(source="profile.company_name")
-    # phone = serializers.CharField(source="profile.phone")
+    company_name = serializers.CharField(source="profile.company_name")
+    phone = serializers.CharField(source="profile.phone")
 
     class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields # + ('company_name','phone')
+        fields = UserDetailsSerializer.Meta.fields + ('company_name','phone')
 
     def update(self, instance, validated_data):
-        profile_data = validated_data.pop('userprofile', {})
+        profile_data = validated_data.pop('profile', {})
         company_name = profile_data.get('company_name')
         phone = profile_data.get('phone')
         ## initialize super base class
         instance = super(UserSerializer, self).update(instance, validated_data)
 
         # get and update user profile
-        profile = instance.userprofile
+        profile = instance.profile
         if profile_data:
             if company_name:
                 profile.company_name = company_name
@@ -34,6 +35,43 @@ class UserSerializer(UserDetailsSerializer):
         request.user.is_active = False
         request.user.save()
         return Response(status=204)
+
+
+class CustomRegisterSerializer(RegisterSerializer):
+    first_name = serializers.CharField(required = True, write_only=True)
+    last_name = serializers.CharField(required = True, write_only=True)
+
+    company_name = serializers.CharField(required = True, write_only=True)
+    phone = serializers.CharField(required = True, write_only=True)
+
+    # class Meta(RegisterSerializer.Meta):
+    #     fields = RegisterSerializer.Meta.fields + ('company_name','phone')
+
+    # def custom_signup(self, request, user):
+    #     profile = user.profile
+    #     profile.company_name = "asdf"
+    #     profile.phone = '2435-4325'
+    #     profile.save()
+
+    def get_cleaned_data(self):
+        super(CustomRegisterSerializer, self).get_cleaned_data()
+        return {
+            'username': self.validated_data.get('username', ''),
+            'password1': self.validated_data.get('password1', ''),
+            'email': self.validated_data.get('email', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
+            'phone': self.validated_data.get('phone', ''),
+            'company_name': self.validated_data.get('company_name', '')
+        }
+
+    def custom_signup(self, request, user):
+        cleaned = self.get_cleaned_data()
+        profile = user.profile
+        profile.company_name = cleaned['company_name']
+        profile.phone = cleaned['phone']
+        profile.save()
+        pass
 
 # class UserProfileSerializer(serializers.HyperlinkedModelSerializer)
 #     class Meta:
