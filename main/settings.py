@@ -189,7 +189,7 @@ ACCOUNT_EMAIL_REQUIRED = True   ## username based login
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USERNAME_REQUIRED = True
 
-EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.environ["SENDGRID_USER_NAME"]
 EMAIL_HOST_PASSWORD = os.environ["SENDGRID_PASSWORD"]
 EMAIL_PORT = 587
