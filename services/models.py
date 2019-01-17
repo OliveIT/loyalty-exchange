@@ -50,6 +50,7 @@ class UserProfile(models.Model):
     wallet = models.CharField(max_length=100, null=True)
     company_name = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=100, unique=True, null=True)
+    birth = models.CharField(max_length=100, blank=True)
 
     #####
     services = models.ManyToManyField(

@@ -39,14 +39,14 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # serializer.save(owner=self.request.user)
         serializer.save()
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list` and `detail` actions.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     """ 
     This viewset automatically provides `list` and `detail` actions.
     """

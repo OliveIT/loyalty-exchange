@@ -10,14 +10,16 @@ class UserSerializer(UserDetailsSerializer):
 
     company_name = serializers.CharField(source="profile.company_name")
     phone = serializers.CharField(source="profile.phone")
+    birth = serializers.CharField(source="profile.birth")
 
     class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields + ('company_name','phone')
+        fields = UserDetailsSerializer.Meta.fields + ('company_name', 'phone', 'birth')
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
         company_name = profile_data.get('company_name')
         phone = profile_data.get('phone')
+        birth = profile_data.get('birth')
         ## initialize super base class
         instance = super(UserSerializer, self).update(instance, validated_data)
 
@@ -28,6 +30,8 @@ class UserSerializer(UserDetailsSerializer):
                 profile.company_name = company_name
             if phone:
                 profile.phone = phone
+            if birth:
+                profile.birth = birth
             profile.save()
         return instance
 
@@ -40,6 +44,7 @@ class UserSerializer(UserDetailsSerializer):
 class CustomRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField(required = True, write_only=True)
     last_name = serializers.CharField(required = True, write_only=True)
+    birth = serializers.CharField(required = True, write_only=True)
 
     company_name = serializers.CharField(required = True, write_only=True)
     phone = serializers.CharField(required = True, write_only=True)
@@ -62,7 +67,8 @@ class CustomRegisterSerializer(RegisterSerializer):
             'first_name': self.validated_data.get('first_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
             'phone': self.validated_data.get('phone', ''),
-            'company_name': self.validated_data.get('company_name', '')
+            'company_name': self.validated_data.get('company_name', ''),
+            'birth': self.validated_data.get('birth', ''),
         }
 
     def custom_signup(self, request, user):
@@ -70,6 +76,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         profile = user.profile
         profile.company_name = cleaned['company_name']
         profile.phone = cleaned['phone']
+        profile.birth = cleaned['birth']
         profile.save()
         pass
 
