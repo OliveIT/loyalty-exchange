@@ -6,7 +6,7 @@
       "verified": 1,
       "primary": 1,
       "user_id": 2,
-      "email": "user1@example.com"
+      "email": "one@example.com"
     }
   },
   {
@@ -16,7 +16,7 @@
       "verified": 1,
       "primary": 1,
       "user_id": 3,
-      "email": "user2@example.com"
+      "email": "two@example.com"
     }
   },
   {
@@ -25,8 +25,8 @@
     "fields": {
       "verified": 1,
       "primary": 1,
-      "user_id": 3,
-      "email": "user3@example.com"
+      "user_id": 4,
+      "email": "three@example.com"
     }
   }
 ]
