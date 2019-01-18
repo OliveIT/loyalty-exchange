@@ -41,10 +41,10 @@ class LoginSerializer(serializers.Serializer):
     def _validate_phone_email(self, phone, email, password):
         user = None
 
-        if email and password:
-            user = authenticate(email=email, password=password)
-        elif phone and password:
+        if phone and password:
             user = authenticate(username=phone, password=password)
+        elif email and password:
+            user = authenticate(email=email, password=password)
         else:
             msg = _('Must include either "phone" or "email" and "password".')
             raise exceptions.ValidationError(msg)
