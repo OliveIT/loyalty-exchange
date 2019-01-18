@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from rest_framework import generics, permissions, renderers, viewsets
 from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from services.models import Service, CurrencyRate, UserProfile,Membership
+from services.models import Service, CurrencyRate, MyUser, UserProfile, Membership
 from services.permissions import IsAdminOrReadOnly
 from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer,ProfileSerializer,MembershipSerializer
 
@@ -43,7 +43,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list` and `detail` actions.
     """
-    queryset = User.objects.all()
+    queryset = MyUser.objects.all()
     serializer_class = UserSerializer
 
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):

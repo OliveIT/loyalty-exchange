@@ -1,12 +1,12 @@
 [
   {
-    "model": "auth.user",
+    "model": "services.myuser",
     "pk": 1,
     "fields": {
       "password": "pbkdf2_sha256$100000$FjAfDFdEP4rn$Ai2Hip+dcFMoGa2q6W7QF3x7RFCEFBykBsEQYEJ3Fdk=",
       "last_login": null,
       "is_superuser": true,
-      "username": "admin",
+      "phone": "0000000",
       "first_name": "",
       "last_name": "",
       "email": "admin@example.com",
@@ -18,13 +18,13 @@
     }
   },
   {
-    "model": "auth.user",
+    "model": "services.myuser",
     "pk": 2,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
       "is_superuser": false,
-      "username": "one",
+      "phone": "1111111",
       "first_name": "",
       "last_name": "",
       "email": "one@example.com",
@@ -36,13 +36,13 @@
     }
   },
   {
-    "model": "auth.user",
+    "model": "services.myuser",
     "pk": 3,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
       "is_superuser": false,
-      "username": "two",
+      "phone": "2222222",
       "first_name": "",
       "last_name": "",
       "email": "two@example.com",
@@ -54,13 +54,13 @@
     }
   },
   {
-    "model": "auth.user",
+    "model": "services.myuser",
     "pk": 4,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
       "is_superuser": false,
-      "username": "three",
+      "phone": "3333333",
       "first_name": "",
       "last_name": "",
       "email": "three@example.com",

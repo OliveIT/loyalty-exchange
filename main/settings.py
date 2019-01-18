@@ -130,6 +130,8 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
+AUTH_USER_MODEL = 'services.MyUser'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -180,7 +182,7 @@ REST_SESSION_LOGIN = True
 SITE_ID = 1
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # ACCOUNT_EMAIL_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 # ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -196,10 +198,13 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_UNIQUE_EMAIL = True
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # ACCOUNT_USERNAME_REQUIRED = False
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
+USER_MODEL_USERNAME_FIELD = 'phone'
 
 # must enter old password to change password
 OLD_PASSWORD_FIELD_ENABLED = True
@@ -210,11 +215,13 @@ SWAGGER_SETTINGS = {
 }
 
 REST_AUTH_SERIALIZERS = {
-#     'REGISTER_SERIALIZER': 'services.serializers.CustomRegisterSerializer',
+    'LOGIN_SERIALIZER': 'services.serializers_custom.LoginSerializer',
     'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer'
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'services.serializers.CustomRegisterSerializer',
+    'REGISTER_SERIALIZER': 'services.serializers_custom.CustomRegisterSerializer',
     # 'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer'
 }
+
+ACCOUNT_ADAPTER = 'services.adapters.CustomUserAccountAdapter'

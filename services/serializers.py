@@ -1,37 +1,40 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.response import Response
 from django.db import IntegrityError, transaction
-from services.models import Service, Membership, CurrencyRate,UserProfile
+from services.models import Service, Membership, CurrencyRate, MyUser, UserProfile
 from rest_auth.serializers import UserDetailsSerializer
-from rest_auth.registration.serializers import RegisterSerializer
 
-class UserSerializer(UserDetailsSerializer):
+class UserSerializer(serializers.ModelSerializer):
 
-    company_name = serializers.CharField(source="profile.company_name")
-    phone = serializers.CharField(source="profile.phone")
-    birth = serializers.CharField(source="profile.birth")
+    # company_name = serializers.CharField(source="profile.company_name")
+    phone = serializers.CharField()
+    # birth = serializers.CharField(source="profile.birth")
 
-    class Meta(UserDetailsSerializer.Meta):
-        fields = UserDetailsSerializer.Meta.fields + ('company_name', 'phone', 'birth')
+    class Meta():
+        model = MyUser
+        fields = ('pk', 'email', 'phone') # 'first_name', 'last_name')
+        # fields = UserDetailsSerializer.Meta.fields + ('phone', ) #, 'company_name', 'birth')
+        read_only_fields = ('email',)
 
+    """
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
-        company_name = profile_data.get('company_name')
+        # company_name = profile_data.get('company_name')
         phone = profile_data.get('phone')
-        birth = profile_data.get('birth')
+        # birth = profile_data.get('birth')
         ## initialize super base class
         instance = super(UserSerializer, self).update(instance, validated_data)
 
         # get and update user profile
         profile = instance.profile
         if profile_data:
-            if company_name:
-                profile.company_name = company_name
+            # if company_name:
+            #     profile.company_name = company_name
             if phone:
                 profile.phone = phone
-            if birth:
-                profile.birth = birth
+            # if birth:
+            #     profile.birth = birth
             profile.save()
         return instance
 
@@ -39,46 +42,9 @@ class UserSerializer(UserDetailsSerializer):
         request.user.is_active = False
         request.user.save()
         return Response(status=204)
+    """
 
 
-class CustomRegisterSerializer(RegisterSerializer):
-    first_name = serializers.CharField(required = True, write_only=True)
-    last_name = serializers.CharField(required = True, write_only=True)
-    birth = serializers.CharField(required = True, write_only=True)
-
-    company_name = serializers.CharField(required = True, write_only=True)
-    phone = serializers.CharField(required = True, write_only=True)
-
-    # class Meta(RegisterSerializer.Meta):
-    #     fields = RegisterSerializer.Meta.fields + ('company_name','phone')
-
-    # def custom_signup(self, request, user):
-    #     profile = user.profile
-    #     profile.company_name = "asdf"
-    #     profile.phone = '2435-4325'
-    #     profile.save()
-
-    def get_cleaned_data(self):
-        super(CustomRegisterSerializer, self).get_cleaned_data()
-        return {
-            'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'email': self.validated_data.get('email', ''),
-            'first_name': self.validated_data.get('first_name', ''),
-            'last_name': self.validated_data.get('last_name', ''),
-            'phone': self.validated_data.get('phone', ''),
-            'company_name': self.validated_data.get('company_name', ''),
-            'birth': self.validated_data.get('birth', ''),
-        }
-
-    def custom_signup(self, request, user):
-        cleaned = self.get_cleaned_data()
-        profile = user.profile
-        profile.company_name = cleaned['company_name']
-        profile.phone = cleaned['phone']
-        profile.birth = cleaned['birth']
-        profile.save()
-        pass
 
 # class UserProfileSerializer(serializers.HyperlinkedModelSerializer)
 #     class Meta:
@@ -182,13 +148,13 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source='user.id')
-    username = serializers.ReadOnlyField(source='user.username')
     email = serializers.ReadOnlyField(source='user.email')
     services = ServiceSerializer(many=True, read_only=True)
     memberships = MembershipSerializer(source='membership', many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('user_id','username','email', 'company_name', 'phone', 'wallet', 'is_active', 'memberships', 'services')
+        fields = ('user_id', 'email', 'memberships', 'services')
+        # 'company_name',  'wallet', 'is_active',
         depth = 1
 
 """

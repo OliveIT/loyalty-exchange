@@ -1,7 +1,68 @@
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
+
+from django.core.validators import RegexValidator
+from django.contrib.auth.models import BaseUserManager
+class MyUserManager(BaseUserManager):
+    """
+    A custom user manager to deal with emails as unique identifiers for auth
+    instead of usernames. The default that's used is "UserManager"
+    """
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Creates and saves a User with the given email and password.
+        """
+        if not email:
+            raise ValueError('The Email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        return self._create_user(email, password, **extra_fields)
+
+class MyUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True, null=True)
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone = models.CharField(validators=[phone_regex], max_length=17, unique=True, null=True) # validators should be a list
+    first_name = models.EmailField(max_length=100, blank=True, default='')
+    last_name = models.EmailField(max_length=100, blank=True, default='')
+    date_joined = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(
+        'staff status',
+        default=False,
+        help_text='Is the user allowed to have access to the admin',
+    )
+    is_active = models.BooleanField(
+        'active',
+        default=True,
+        help_text= 'Is the user account currently active',
+    )
+    USERNAME_FIELD = 'phone'
+    objects = MyUserManager()
+ 
+    def __str__(self):
+        return self.email
+ 
+    def get_full_name(self):
+        return self.email
+ 
+    def get_short_name(self):
+        return self.email
+
 
 STYLES = ['airline', 'mart', 'spa', 'gym', 'taxi']
 COUNTRIES = ['US', 'CA', 'DE', 'FR', 'UK']
@@ -45,7 +106,7 @@ class Service(models.Model):
 
 class UserProfile(models.Model):
     ## FIXME on_delete really required?
-    user = models.OneToOneField(User, primary_key=True, related_name='profile', on_delete=models.CASCADE)
+    user = models.OneToOneField(MyUser, primary_key=True, related_name='profile', on_delete=models.CASCADE)
     # custom fields for user
     wallet = models.CharField(max_length=100, null=True)
     company_name = models.CharField(max_length=100, blank=True)
@@ -65,22 +126,22 @@ class UserProfile(models.Model):
     #####
 
     def __str__(self):
-        return self.user.username + ' at ' + self.company_name ;
+        return self.user.email;
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=MyUser)
 def create_profile_for_user(sender, instance=None, created=False, **kwargs):
     if created:
         UserProfile.objects.get_or_create(user=instance)
         print("########### create_profile_for_user")
 
-@receiver(pre_delete, sender=User)
+@receiver(pre_delete, sender=MyUser)
 def delete_profile_for_user(sender, instance=None, **kwargs):
     if instance:
         user_profile = UserProfile.objects.get(user=instance)
         user_profile.delete()
         print("########### delete_profile_for_user")
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=MyUser)
 def create_profile_for_user(sender, instance=None, created=False, **kwargs):
     if created:
         UserProfile.objects.get_or_create(user=instance)
@@ -98,7 +159,7 @@ class Membership(models.Model):
     update_ts = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.service.title + ' ' + self.profile.username + ' ' + self.points + ' pts'
+        return self.service.title + ' ' + self.profile.email + ' ' + self.points + ' pts'
 
 class CurrencyRate(models.Model):
     currency = models.CharField(default='USD', max_length=100)
