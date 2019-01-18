@@ -8,14 +8,14 @@ from rest_auth.serializers import UserDetailsSerializer
 class UserSerializer(serializers.ModelSerializer):
 
     # company_name = serializers.CharField(source="profile.company_name")
-    phone = serializers.CharField()
+    # phone = serializers.CharField()
     # birth = serializers.CharField(source="profile.birth")
 
     class Meta():
         model = MyUser
-        fields = ('pk', 'email', 'phone') # 'first_name', 'last_name')
+        fields = ('pk', 'email', 'phone', 'first_name', 'last_name')
         # fields = UserDetailsSerializer.Meta.fields + ('phone', ) #, 'company_name', 'birth')
-        read_only_fields = ('email',)
+        read_only_fields = ('email', 'phone',)
 
     """
     def update(self, instance, validated_data):

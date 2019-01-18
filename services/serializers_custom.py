@@ -151,12 +151,13 @@ class CustomRegisterSerializer(serializers.Serializer):
     #     min_length=allauth_settings.USERNAME_MIN_LENGTH,
     #     required=allauth_settings.USERNAME_REQUIRED
     # )
-
     phone = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
     # email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(required = True, write_only=True)
+    last_name = serializers.CharField(required = True, write_only=True)
 
     def validate_email(self, email):
         email = get_adapter().clean_email(email)
@@ -191,6 +192,8 @@ class CustomRegisterSerializer(serializers.Serializer):
             'phone': self.validated_data.get('phone', ''),
             'email': self.validated_data.get('email', ''),
             'password1': self.validated_data.get('password1', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
         }
 
     def save(self, request):
