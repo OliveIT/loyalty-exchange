@@ -204,7 +204,6 @@ ACCOUNT_UNIQUE_EMAIL = True
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
-USER_MODEL_USERNAME_FIELD = 'phone'
 
 # must enter old password to change password
 OLD_PASSWORD_FIELD_ENABLED = True
@@ -221,7 +220,11 @@ REST_AUTH_SERIALIZERS = {
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'services.serializers_custom.CustomRegisterSerializer',
-    # 'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer'
 }
 
 ACCOUNT_ADAPTER = 'services.adapters.CustomUserAccountAdapter'
+
+AUTHENTICATION_BACKENDS = (
+    'services.backends.CustomAuthBackend',
+    # 'django.contrib.auth.backends.ModelBackend', # we don't need this anymore
+)
