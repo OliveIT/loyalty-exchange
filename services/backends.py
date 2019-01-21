@@ -34,3 +34,21 @@ class CustomAuthBackend(ModelBackend):
             return None
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
+
+    def user_can_authenticate(self, user):
+        """
+        Reject users with is_active=False. Custom user models that don't have
+        that attribute are allowed.
+        """
+        is_active = getattr(user, 'is_active', None)
+        # return is_active or is_active is None
+        if is_active == False :
+            return None
+
+        email_address = user.emailaddress_set.get(email=user.email)
+        if not email_address.verified:
+            # raise exceptions.AuthenticationFailed('Email Not Verified')
+            # raise exceptions.ValidationError("###### Email Not Verified")
+            return None
+
+        return True

@@ -9,6 +9,8 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from allauth.utils import (email_address_exists, get_username_max_length)
 
+import phonenumbers
+
 UserModel = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
@@ -60,14 +62,12 @@ class LoginSerializer(serializers.Serializer):
         user = None
 
         if 'allauth' in settings.INSTALLED_APPS:
-            from allauth.account import app_settings
-
             # Authentication through email
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
+            if allauth_settings.AUTHENTICATION_METHOD == allauth_settings.AuthenticationMethod.EMAIL:
                 user = self._validate_email(email, password)
 
             # Authentication through phone
-            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+            elif allauth_settings.AUTHENTICATION_METHOD == allauth_settings.AuthenticationMethod.USERNAME:
                 user = self._validate_phone(phone, password)
 
             # Authentication through either phone or email
@@ -96,8 +96,7 @@ class LoginSerializer(serializers.Serializer):
 
         # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
-            from allauth.account import app_settings
-            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+            if allauth_settings.EMAIL_VERIFICATION == allauth_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
                     raise serializers.ValidationError(_('E-mail is not verified.'))
@@ -174,6 +173,12 @@ class CustomRegisterSerializer(serializers.Serializer):
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(_("The two password fields didn't match."))
         
+        # check if valid phone number format
+        try:
+            correct_format = phonenumbers.parse(data['phone'], None)
+        except phonenumbers.NumberParseException as e:
+            raise serializers.ValidationError(_(str(e)))
+
         # see if existing phone
         users = get_user_model().objects
         ret = users.filter(**{'phone' + '__iexact': data['phone']}).exists()

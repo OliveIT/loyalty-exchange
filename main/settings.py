@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
 
     'django.contrib.admin',
+
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +74,9 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR + '/env/lib/python3.6/site-packages/rest_framework/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -189,7 +193,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True   ## username based login
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.environ["SENDGRID_USER_NAME"]
@@ -227,4 +231,7 @@ ACCOUNT_ADAPTER = 'services.adapters.CustomUserAccountAdapter'
 AUTHENTICATION_BACKENDS = (
     'services.backends.CustomAuthBackend',
     # 'django.contrib.auth.backends.ModelBackend', # we don't need this anymore
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+LOGIN_REDIRECT_URL = '/'
