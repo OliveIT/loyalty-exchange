@@ -76,8 +76,8 @@ COUNTRY_CHOICES = sorted((item, item) for item in COUNTRIES)
 class Service(models.Model):
     title = models.CharField(max_length=100, blank=False, default='')
     description = models.TextField()
-    service_type = models.CharField(choices=STYLE_CHOICES, default='airline', max_length=100)
-    country = models.CharField(choices=COUNTRY_CHOICES, default='US', max_length=100)
+    service_type = models.CharField(blank=False, max_length=100, default='')
+    country = models.CharField(blank=False, max_length=100, default='')
     is_opened = models.BooleanField(default=True)
     # owner = models.ForeignKey(
     #     'auth.User', related_name='services', on_delete=models.CASCADE)
@@ -156,7 +156,7 @@ class Membership(models.Model):
     profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='membership')
     service = models.ForeignKey(Service, on_delete=models.CASCADE)#, related_name='membership')
 
-    points = models.IntegerField(default=0)
+    # points = models.IntegerField(default=0)
     identifier = models.CharField(max_length=100, blank=True, default='')
     #date_of_joining = models.DateTimeField()
     install_ts = models.DateTimeField(auto_now_add=True, blank=True)
