@@ -45,6 +45,10 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.EmailField(max_length=100, blank=True, default='')
     last_name = models.EmailField(max_length=100, blank=True, default='')
     date_joined = models.DateTimeField(auto_now_add=True)
+
+    eth_public_key = models.CharField(max_length=100, blank=True, default='')
+    eth_secret_key = models.CharField(max_length=100, blank=True, default='')
+
     is_staff = models.BooleanField(
         'staff status',
         default=False,
