@@ -1,7 +1,3 @@
-import random
-import string
-from eth_account import Account
-
 from django.conf import settings
 from allauth.account.adapter import DefaultAccountAdapter
 
@@ -30,12 +26,6 @@ class CustomUserAccountAdapter(DefaultAccountAdapter):
             user.set_password(data["password1"])
         else:
             user.set_unusable_password()
-
-        # generate ethereum wallet
-        entropy = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(50))
-        account = Account.create(entropy)
-        user_field(user, 'eth_public_key', account.address)
-        user_field(user, 'eth_secret_key', account.privateKey.hex())
 
         if commit:
             # Ability not to commit makes it easier to derive from

@@ -8,6 +8,10 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import BaseUserManager
 
 from phonenumber_field.modelfields import PhoneNumberField
+# to generate eth wallet
+import random
+import string
+from eth_account import Account
 
 class MyUserManager(BaseUserManager):
     """
@@ -45,9 +49,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.EmailField(max_length=100, blank=True, default='')
     last_name = models.EmailField(max_length=100, blank=True, default='')
     date_joined = models.DateTimeField(auto_now_add=True)
-
-    eth_public_key = models.CharField(max_length=100, blank=True, default='')
-    eth_secret_key = models.CharField(max_length=100, blank=True, default='')
 
     is_staff = models.BooleanField(
         'staff status',
@@ -89,8 +90,6 @@ class Service(models.Model):
     api_url = models.CharField(max_length=300, blank=False, default='')
     created = models.DateTimeField(auto_now_add=True)
     
-    # subscribers = models.ManyToManyField(User)
-
     def __str__(self):
         return self.title
 
@@ -116,17 +115,18 @@ class UserProfile(models.Model):
     ## FIXME on_delete really required?
     user = models.OneToOneField(MyUser, primary_key=True, related_name='profile', on_delete=models.CASCADE)
     # custom fields for user
-    wallet = models.CharField(max_length=100, null=True)
-    company_name = models.CharField(max_length=100, blank=True)
-    phone = models.CharField(max_length=100, unique=True, null=True)
-    birth = models.CharField(max_length=100, blank=True)
+    company_name = models.CharField(max_length=100, blank=True, default='')
+    eth_public_key = models.CharField(max_length=100, blank=True, default='')
+    eth_secret_key = models.CharField(max_length=100, blank=True, default='')
+
+    extra_points = models.DecimalField(default=0, max_digits=16, decimal_places=6)
 
     #####
     services = models.ManyToManyField(
         Service,
         through='Membership',
         # through_fields=('profile', 'service'),
-        # related_name='members'
+        related_name='members'
     )
     is_active = models.BooleanField(default=True)
     # install_ts = models.DateTimeField(auto_now_add=True)
@@ -136,23 +136,19 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.email;
 
-@receiver(post_save, sender=MyUser)
-def create_profile_for_user(sender, instance=None, created=False, **kwargs):
-    if created:
-        UserProfile.objects.get_or_create(user=instance)
-        print("########### create_profile_for_user")
-
 @receiver(pre_delete, sender=MyUser)
 def delete_profile_for_user(sender, instance=None, **kwargs):
     if instance:
         user_profile = UserProfile.objects.get(user=instance)
         user_profile.delete()
-        print("########### delete_profile_for_user")
+        print("-------- delete_profile_for_user")
 
 @receiver(post_save, sender=MyUser)
 def create_profile_for_user(sender, instance=None, created=False, **kwargs):
     if created:
-        UserProfile.objects.get_or_create(user=instance)
+        entropy = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(50))
+        account = Account.create(entropy)
+        profile, newly = UserProfile.objects.get_or_create(user=instance, eth_public_key = account.address, eth_secret_key = account.privateKey.hex())
         print("########### create_profile_for_user")
 
 

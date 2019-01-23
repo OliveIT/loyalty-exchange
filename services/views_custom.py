@@ -47,6 +47,23 @@ class GetPoints(APIView):
         pass
 
     def post(self, request, format=None):
+        # for services
+        #     data fetch from service
+        #     for service.members
+        #         
+        services = Service.objects.all()
+        for service in services:
+            # res = requests.get(service.api_url, data=None)
+            print("service.api_url " + service.api_url)
+            memberships = Membership.objects.filter(service=service.pk)
+
+            for membership in memberships:
+                print(membership.identifier)
+            # print(service.pk)
+            # print( Membership.objects.filter(service__pk = 3) )
+
+        return Response({'a':'ok'}, status=status.HTTP_200_OK)
+
         user_id = request.data.get('user', None)
         service_id = request.data.get('service', None)
         identifier = request.data.get('identifier', None)

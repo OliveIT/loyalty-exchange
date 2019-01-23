@@ -18,10 +18,10 @@
   "pk": 2,
   "fields": {
     "created": "2018-01-04T18:09:36.612Z",
-    "title": "super mart",
-    "description": " very good mart",
+    "title": "super restaurant",
+    "description": " very good restaurant",
     "is_opened": true,
-    "service_type": "mart",
+    "service_type": "restaurant",
     "country": "UK",
     "contact": "543-15423",
     "api_url": "https://mart.com"
