@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from django.core import serializers
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -11,13 +13,83 @@ import requests
 import json
 import os, sys, inspect
 
+from decimal import Decimal
+
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
+
 import web3
 
 from web3 import Web3
 from web3.contract import ConciseContract
+# from web3.providers.eth_tester import EthereumTesterProvider
 
-from web3.providers.eth_tester import EthereumTesterProvider
-from web3 import Web3
+def update_a_customer(pk, eth=False):
+    factory = APIRequestFactory()
+    request = factory.get('/')
+
+    serializer_context = {
+        'request': Request(request),
+    }
+    serializer = ProfileSerializer(instance = UserProfile.objects.get(pk=pk), context=serializer_context)
+    # FIXME swallow copy?
+    profile_data = dict(serializer.data)
+    total = Decimal(profile_data['extra_points'])
+    for membership in profile_data['memberships']:
+        membership['real'] = Decimal(membership['points']) * Decimal(membership['rate'])
+        total += Decimal(membership['real'])
+    profile_data['total'] = total
+    # TODO remove useless properties
+    del profile_data['services']
+
+    # TODO update via web3
+    if eth == True:
+        pass
+
+    return profile_data
+
+
+def update_everyone(eth=False):
+    res = []
+    for profile in UserProfile.objects.all():
+        res.append(update_a_customer(pk = profile.pk, eth=eth))
+
+    # content = JSONRenderer().render(res)
+    return res
+
+def fetchAPI(service):
+    # res = requests.get(service.api_url, data=None)
+    print("service.api_url " + service.api_url)
+
+    json_data = open(settings.BASE_DIR + '/services/fixtures/memberships.json')   
+    data1 = json.load(json_data) # deserialises it
+    # data2 = json.dumps(json_data) # json formatted string
+    ret = {"result": "ok", "data": []}
+    for membership in data1:
+        if membership['fields']['service_id'] == service.pk:
+            ret['data'].append(membership['fields'])
+
+    json_data.close()
+    return ret
+
+    # response = {
+            #     "result": "ok",
+            #     "data": [{  "points": 123.43,
+            #         "rate": 2.5,
+            #         "customerIdentifier":"dry2",
+            #         "serviceID":"Midastouchdrycleaners"},
+            #     {   "points": 100.43,
+            #         "rate": 2.5,
+            #         "customerIdentifier":"dry4",
+            #         "serviceID":"Midastouchdrycleaners" },
+            #     {   "points": 43.632,
+            #         "rate": 2.5,
+            #         "customerIdentifier":"dry5",
+            #         "serviceID":"Midastouchdrycleaners" }
+            #     ]}
 
 class GetPoints(APIView):
     """
@@ -52,17 +124,34 @@ class GetPoints(APIView):
         #     for service.members
         #         
         services = Service.objects.all()
-        for service in services:
-            # res = requests.get(service.api_url, data=None)
-            print("service.api_url " + service.api_url)
+        for service in services: # all services
+                       
+            response = fetchAPI(service)
+            # members of current service
             memberships = Membership.objects.filter(service=service.pk)
 
             for membership in memberships:
-                print(membership.identifier)
+                # check if this guy is included in the response
+                # isFound = False
+                for res in response['data']:
+                    # if res['customerIdentifier'] == membership.identifier:
+                    if res['identifier'] == membership.identifier:
+                        # isFound = True
+                        membership.points = res['points']
+                        membership.rate = res['rate']
+                        membership.save()
+                        break
+                
+                # if isFound == True:
+                #     break
+                # member = membership.profile
+                # print(membership.identifier)
+            break
+
             # print(service.pk)
             # print( Membership.objects.filter(service__pk = 3) )
 
-        return Response({'a':'ok'}, status=status.HTTP_200_OK)
+        return Response(update_everyone(), status=status.HTTP_200_OK)
 
         user_id = request.data.get('user', None)
         service_id = request.data.get('service', None)
@@ -107,7 +196,7 @@ class GetPoints(APIView):
             else:
                 error_msg['details'] = "User or Service not found or user isn't a member of the service!"
         else:
-            error_msg['details'] = "user, service, identifer, password fields are required!"
+            error_msg['details'] = "user, service, identifier, password fields are required!"
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
         # serializer = MembershipSerializer(data=request.data)
@@ -167,7 +256,7 @@ class RedeemPoints(APIView):
             else:
                 error_msg['details'] = "User or Service not found or user isn't a member of the service!"
         else:
-            error_msg['details'] = "user, service, identifer, password, positive amount fields are required!"
+            error_msg['details'] = "user, service, identifier, password, positive amount fields are required!"
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
 class TotalPoints(APIView):

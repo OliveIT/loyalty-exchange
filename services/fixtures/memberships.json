@@ -1,0 +1,134 @@
+[
+	{
+		"model": "services.membership",
+		"pk": 1,
+		"fields": {
+			"identifier": "google-one-A",
+			"service_id": 1,
+			"profile_id": 1,
+			"points": 3,
+			"rate": 10
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 2,
+		"fields": {
+			"identifier": "google-three-C",
+			"service_id": 1,
+			"profile_id": 3,
+			"points": 4,
+			"rate": 10
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 3,
+		"fields": {
+			"identifier": "google-four",
+			"service_id": 1,
+			"profile_id": 4,
+			"points": 43.632000,
+			"rate": 10
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 4,
+		"fields": {
+			"identifier": "amazon-one-A",
+			"service_id": 2,
+			"profile_id": 1,
+			"points": 2,
+			"rate": 20
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 5,
+		"fields": {
+			"identifier": "amazon-two-B",
+			"service_id": 2,
+			"profile_id": 2,
+			"points": 3,
+			"rate": 20
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 6,
+		"fields": {
+			"identifier": "amazon-three-C",
+			"service_id": 2,
+			"profile_id": 3,
+			"points": 4,
+			"rate": 20
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 7,
+		"fields": {
+			"identifier": "amazon-five",
+			"service_id": 2,
+			"profile_id": 5,
+			"points": 10.42,
+			"rate": 20
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 8,
+		"fields": {
+			"identifier": "microsoft-two-B",
+			"service_id": 3,
+			"profile_id": 2,
+			"points": 2,
+			"rate": 50
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 9,
+		"fields": {
+			"identifier": "microsoft-four",
+			"service_id": 3,
+			"profile_id": 4,
+			"points": 20.332,
+			"rate": 50
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 10,
+		"fields": {
+			"identifier": "facebook-one-A",
+			"service_id": 4,
+			"profile_id": 1,
+			"points": 1,
+			"rate": 30
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 11,
+		"fields": {
+			"identifier": "facebook-two-B",
+			"service_id": 4,
+			"profile_id": 2,
+			"points": 1,
+			"rate": 30
+		}
+	},
+	{
+		"model": "services.membership",
+		"pk": 12,
+		"fields": {
+			"identifier": "facebook-three-C",
+			"service_id": 4,
+			"profile_id": 3,
+			"points": 2,
+			"rate": 30
+		}
+	}
+]

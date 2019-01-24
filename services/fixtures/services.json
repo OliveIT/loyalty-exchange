@@ -4,13 +4,13 @@
   "pk": 1,
   "fields": {
     "created": "2018-01-04T18:09:36.612Z",
-    "title": "cool spa",
-    "description": " the no 1 spa in the world",
+    "title": "Google",
+    "description": "the no 1 search engine in the world",
     "is_opened": true,
-    "service_type": "spa",
+    "service_type": "search engine",
     "country": "FR",
     "contact": "123-123123",
-    "api_url": "https://spa.com"
+    "api_url": "https://google.com"
   }
 },
 {
@@ -18,13 +18,13 @@
   "pk": 2,
   "fields": {
     "created": "2018-01-04T18:09:36.612Z",
-    "title": "super restaurant",
-    "description": " very good restaurant",
+    "title": "Amazon",
+    "description": "very best online shopping site",
     "is_opened": true,
-    "service_type": "restaurant",
+    "service_type": "ecommerce",
     "country": "UK",
     "contact": "543-15423",
-    "api_url": "https://mart.com"
+    "api_url": "https://amazon.com"
   }
 },
 {
@@ -32,13 +32,27 @@
   "pk": 3,
   "fields": {
     "created": "2018-01-01T18:09:36.612Z",
-    "title": "UBER",
-    "description": "awesome taxi service",
+    "title": "Microsoft",
+    "description": "mother of windows",
     "is_opened": true,
-    "service_type": "taxi",
+    "service_type": "software",
     "country": "US",
     "contact": "345-21332",
-    "api_url": "https://taxi.com"
+    "api_url": "https://microsoft.com"
+  }
+},
+{
+  "model": "services.service",
+  "pk": 4,
+  "fields": {
+    "created": "2018-01-01T18:09:36.612Z",
+    "title": "Facebook",
+    "description": "top social media",
+    "is_opened": true,
+    "service_type": "social",
+    "country": "Nigeria",
+    "contact": "345-21332",
+    "api_url": "https://facebook.com"
   }
 }
 ]

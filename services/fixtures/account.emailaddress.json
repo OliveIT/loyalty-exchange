@@ -5,7 +5,7 @@
     "fields": {
       "verified": 1,
       "primary": 1,
-      "user_id": 2,
+      "user_id": 1,
       "email": "one@example.com"
     }
   },
@@ -15,7 +15,7 @@
     "fields": {
       "verified": 1,
       "primary": 1,
-      "user_id": 3,
+      "user_id": 2,
       "email": "two@example.com"
     }
   },
@@ -25,7 +25,7 @@
     "fields": {
       "verified": 1,
       "primary": 1,
-      "user_id": 4,
+      "user_id": 3,
       "email": "three@example.com"
     }
   },
@@ -35,7 +35,7 @@
     "fields": {
       "verified": 1,
       "primary": 1,
-      "user_id": 5,
+      "user_id": 4,
       "email": "four@example.com"
     }
   },
@@ -45,58 +45,8 @@
     "fields": {
       "verified": 1,
       "primary": 1,
-      "user_id": 6,
+      "user_id": 5,
       "email": "five@example.com"
-    }
-  },
-  {
-    "model": "account.emailaddress",
-    "pk": 6,
-    "fields": {
-      "verified": 1,
-      "primary": 1,
-      "user_id": 7,
-      "email": "six@example.com"
-    }
-  },
-  {
-    "model": "account.emailaddress",
-    "pk": 7,
-    "fields": {
-      "verified": 1,
-      "primary": 1,
-      "user_id": 8,
-      "email": "seven@example.com"
-    }
-  },
-  {
-    "model": "account.emailaddress",
-    "pk": 8,
-    "fields": {
-      "verified": 1,
-      "primary": 1,
-      "user_id": 9,
-      "email": "eight@example.com"
-    }
-  },
-  {
-    "model": "account.emailaddress",
-    "pk": 9,
-    "fields": {
-      "verified": 1,
-      "primary": 1,
-      "user_id": 10,
-      "email": "nine@example.com"
-    }
-  },
-  {
-    "model": "account.emailaddress",
-    "pk": 10,
-    "fields": {
-      "verified": 1,
-      "primary": 1,
-      "user_id": 11,
-      "email": "ten@example.com"
     }
   }
 ]

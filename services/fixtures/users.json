@@ -3,24 +3,6 @@
     "model": "services.myuser",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$100000$FjAfDFdEP4rn$Ai2Hip+dcFMoGa2q6W7QF3x7RFCEFBykBsEQYEJ3Fdk=",
-      "last_login": null,
-      "is_superuser": true,
-      "phone": "+120000000",
-      "first_name": "",
-      "last_name": "",
-      "email": "admin@example.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2017-12-16T17:42:43.941Z",
-      "groups": [],
-      "user_permissions": []
-    }
-  },
-  {
-    "model": "services.myuser",
-    "pk": 2,
-    "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
       "is_superuser": false,
@@ -37,7 +19,7 @@
   },
   {
     "model": "services.myuser",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
@@ -55,7 +37,7 @@
   },
   {
     "model": "services.myuser",
-    "pk": 4,
+    "pk": 3,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
@@ -73,7 +55,7 @@
   },
   {
     "model": "services.myuser",
-    "pk": 5,
+    "pk": 4,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
@@ -91,7 +73,7 @@
   },
   {
     "model": "services.myuser",
-    "pk": 6,
+    "pk": 5,
     "fields": {
       "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
       "last_login": null,
@@ -109,90 +91,18 @@
   },
   {
     "model": "services.myuser",
-    "pk": 7,
+    "pk": 6,
     "fields": {
-      "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
+      "password": "pbkdf2_sha256$100000$FjAfDFdEP4rn$Ai2Hip+dcFMoGa2q6W7QF3x7RFCEFBykBsEQYEJ3Fdk=",
       "last_login": null,
-      "is_superuser": false,
-      "phone": "+120000006",
-      "first_name": "Sixth",
-      "last_name": "Girl",
-      "email": "six@example.com",
+      "is_superuser": true,
+      "phone": "+120000000",
+      "first_name": "Master",
+      "last_name": "Admin",
+      "email": "admin@example.com",
       "is_staff": true,
       "is_active": true,
-      "date_joined": "2017-12-18T17:42:43.941Z",
-      "groups": [],
-      "user_permissions": []
-    }
-  },
-  {
-    "model": "services.myuser",
-    "pk": 8,
-    "fields": {
-      "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
-      "last_login": null,
-      "is_superuser": false,
-      "phone": "+120000007",
-      "first_name": "Seventh",
-      "last_name": "Girl",
-      "email": "seven@example.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2017-12-18T17:42:43.941Z",
-      "groups": [],
-      "user_permissions": []
-    }
-  },
-  {
-    "model": "services.myuser",
-    "pk": 9,
-    "fields": {
-      "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
-      "last_login": null,
-      "is_superuser": false,
-      "phone": "+120000008",
-      "first_name": "Eighth",
-      "last_name": "Girl",
-      "email": "eight@example.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2017-12-18T17:42:43.941Z",
-      "groups": [],
-      "user_permissions": []
-    }
-  },
-  {
-    "model": "services.myuser",
-    "pk": 10,
-    "fields": {
-      "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
-      "last_login": null,
-      "is_superuser": false,
-      "phone": "+120000009",
-      "first_name": "Nineth",
-      "last_name": "Girl",
-      "email": "nine@example.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2017-12-18T17:42:43.941Z",
-      "groups": [],
-      "user_permissions": []
-    }
-  },
-  {
-    "model": "services.myuser",
-    "pk": 11,
-    "fields": {
-      "password": "pbkdf2_sha256$100000$6QW4Drknhffz$jFmx9YtIqP8eYb6dQDNNLzmpdbzgznWdE35XhqyUyEU=",
-      "last_login": null,
-      "is_superuser": false,
-      "phone": "+120000010",
-      "first_name": "Tenth",
-      "last_name": "Girl",
-      "email": "ten@example.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2017-12-18T17:42:43.941Z",
+      "date_joined": "2017-12-16T17:42:43.941Z",
       "groups": [],
       "user_permissions": []
     }

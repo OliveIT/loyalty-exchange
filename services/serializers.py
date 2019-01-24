@@ -143,7 +143,8 @@ class MembershipSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Membership
         # fields = '__all__'
-        fields = ('url', 'identifier', 'profile', 'service' ) 
+        fields = ('url', 'identifier', 'points', 'rate', 'profile', 'service' ) 
+        read_only_fields = ('points', 'rate',)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -153,8 +154,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     memberships = MembershipSerializer(source='membership', many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('user_id', 'email', 'memberships', 'services')
+        fields = ('user_id', 'email', 'eth_public_key', 'extra_points','memberships', 'services')
         # 'company_name',  'wallet', 'is_active',
+        read_only_fields = ('eth_public_key', )
         depth = 1
 
 """

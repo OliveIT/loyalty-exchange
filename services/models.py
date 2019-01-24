@@ -157,13 +157,17 @@ class Membership(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)#, related_name='membership')
 
     # points = models.IntegerField(default=0)
+    points = models.DecimalField(default=0, max_digits=16, decimal_places=6)
+    rate = models.DecimalField(default=0, max_digits=16, decimal_places=6)
     identifier = models.CharField(max_length=100, blank=True, default='')
     #date_of_joining = models.DateTimeField()
-    install_ts = models.DateTimeField(auto_now_add=True, blank=True)
-    update_ts = models.DateTimeField(auto_now_add=True, blank=True)
+    install_ts = models.DateTimeField(auto_now_add=True, null=True)
+    update_ts = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.service.title + ' ' + self.profile.email + ' ' + self.points + ' pts'
+    class Meta:
+        unique_together = (('profile', 'service'),)
 
 class CurrencyRate(models.Model):
     currency = models.CharField(default='USD', max_length=100)
