@@ -24,14 +24,14 @@ from rest_framework.test import APIRequestFactory
 # from web3.providers.eth_tester import EthereumTesterProvider
 
 
-w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/b5d9a6731e714ddda0c3ca38f410b3cf"))
-with open(str( settings.BASE_DIR + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
-    abi = json.load(abi_definition)['abi']
-contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
-contract = w3.eth.contract(address=contract_address, abi=abi)
-concise_contract = ConciseContract(contract)
-nonce = w3.eth.getTransactionCount('0x5ce9454909639D2D17A3F753ce7d93fa0b9aB12E')
-admin_private = "0xaaaaaaaaaaaaaaaaaaaaa"
+# w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/b5d9a6731e714ddda0c3ca38f410b3cf"))
+# with open(str( settings.BASE_DIR + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
+#     abi = json.load(abi_definition)['abi']
+# contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
+# contract = w3.eth.contract(address=contract_address, abi=abi)
+# concise_contract = ConciseContract(contract)
+# nonce = w3.eth.getTransactionCount('0x5ce9454909639D2D17A3F753ce7d93fa0b9aB12E')
+# admin_private = "0xaaaaaaaaaaaaaaaaaaaaa"
 
 def mint_token(address, amount):
     # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
