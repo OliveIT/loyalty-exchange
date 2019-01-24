@@ -150,14 +150,15 @@ class MembershipSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source='user.id')
     email = serializers.ReadOnlyField(source='user.email')
+    phone = serializers.CharField(source='user.phone', read_only=True)
     extra_points = serializers.DecimalField(max_digits=16, decimal_places=6)
     services = ServiceSerializer(many=True, read_only=True)
     memberships = MembershipSerializer(source='membership', many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('user_id', 'email', 'eth_public_key', 'extra_points','memberships', 'services')
+        fields = ('user_id', 'email', 'phone', 'eth_public_key', 'extra_points','memberships', 'services')
         # 'company_name',  'wallet', 'is_active',
-        read_only_fields = ('eth_public_key', )
+        read_only_fields = ('eth_public_key', 'phone', )
         depth = 1
 
 """

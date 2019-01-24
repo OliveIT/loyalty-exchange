@@ -253,7 +253,7 @@ class RedeemPoints(APIView):
                             del customer_status['memberships'][idx]
                             break
 
-                    if remaining > 0:
+                    if remaining > 0 and profile.extra_points > 0:
                         remaining = deduct_from_extra_points(user_id, remaining)
                     
                     if remaining > 0:
@@ -271,12 +271,76 @@ class RedeemPoints(APIView):
                     return Response({'update': updated_customer_status}, status=status.HTTP_200_OK)
                 else:
                     error_msg['details'] = "Not enough points!"
-
             else:
                 error_msg['details'] = "User or Service not found!"
         else:
             error_msg['details'] = "user, service, amount > 1 fields are required!"
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TransferPoints(APIView):
+    """
+    Send request to Service Provider's api url and get point value.
+    """
+
+    # def get(self, request, format=None):
+    #     services = Service.objects.all()
+    #     serializer = ServiceSerializer(services, many=True)
+    #     return Response(serializer.data)
+
+    def post(self, request, format=None):
+        sender_id = request.data.get('sender', None)
+        receiver_phone = request.data.get('receiver_id', None)
+        amount = request.data.get('amount', 0)
+
+        error_msg = {
+            "details": "Unexpected Error Occured!"
+        }
+
+        if sender_id and receiver_phone and amount >= 1:
+            # Membership.objects.get(pk=1)
+            sender = UserProfile.objects.get(pk=sender_id)
+            receiver = UserProfile.objects.get(user__phone=receiver_phone)
+            # user first() method to get model object from array
+            if receiver and sender:
+                
+                sender_status = update_a_customer(pk=sender_id)
+                amount = Decimal(amount)
+
+                if sender_status['total'] >= amount:
+                    # 1. extra_points
+                    # 2. deduct from services increasing order of real points
+                    # 3. increase receiver's extra_points
+                    remaining = amount
+
+                    if remaining > 0 and sender.extra_points > 0:
+                        remaining = deduct_from_extra_points(sender_id, remaining)
+                    
+                    if remaining > 0:
+                        sender_status['memberships'].sort(key = sort_func)
+                        for membership in sender_status['memberships']:
+                            remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
+                            if remaining <= 0:
+                                break
+                    
+                    receiver.extra_points += amount
+                    receiver.save()
+                    # store history
+                    # tx = RedeemTransaction(id=None, amount=amount, user=sender.user, service=service)
+                    # tx.save()
+
+                    updated_customer_status = update_a_customer(pk=sender_id)
+
+                    return Response({'update': updated_customer_status}, status=status.HTTP_200_OK)
+                else:
+                    error_msg['details'] = "Not enough points!"
+            else:
+                error_msg['details'] = "Sender or Receiver not found!"
+        else:
+            error_msg['details'] = "sender, receiver's ID, amount > 1 fields are required!"
+
+        return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TotalPoints(APIView):
     """
