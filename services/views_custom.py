@@ -21,11 +21,23 @@ from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
-import web3
-
-from web3 import Web3
-from web3.contract import ConciseContract
 # from web3.providers.eth_tester import EthereumTesterProvider
+
+
+w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/b5d9a6731e714ddda0c3ca38f410b3cf"))
+with open(str( settings.BASE_DIR + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
+    abi = json.load(abi_definition)['abi']
+contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
+contract = w3.eth.contract(address=contract_address, abi=abi)
+concise_contract = ConciseContract(contract)
+nonce = w3.eth.getTransactionCount('0x5ce9454909639D2D17A3F753ce7d93fa0b9aB12E')
+admin_private = "0xaaaaaaaaaaaaaaaaaaaaa"
+
+def mint_token(address, amount):
+    # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
+    tx_hash = concise_contract.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
+    self.w3.eth.waitForTransactionReceipt(tx_hash)
+    pass
 
 def update_a_customer(pk, eth=False):
     # FIXME when we use hyperlinkedserializer
@@ -50,6 +62,7 @@ def update_a_customer(pk, eth=False):
 
     # TODO update via web3
     if eth == True:
+
         pass
 
     return profile_data
@@ -143,6 +156,7 @@ class GetPoints(APIView):
                         membership.points = res['points']
                         membership.rate = res['rate']
                         membership.save()
+                        # TODO Update Ethereum balance here
                         break
                 
                 # if isFound == True:
@@ -193,6 +207,8 @@ def deduct_from_service(user_id, service_id, amount):
         deducted_amount = real_points - amount
         membership.points = deducted_amount / membership.rate
         membership.save()
+
+        # deduct   amount / membership.rate
         return 0
     membership.points = 0
     membership.save()
