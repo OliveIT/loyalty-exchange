@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 from django.db import IntegrityError, transaction
-from services.models import Service, Membership, CurrencyRate, MyUser, UserProfile
+from services.models import Service, Membership, CurrencyRate, MyUser, UserProfile, RedeemTransaction
 from rest_auth.serializers import UserDetailsSerializer
 
 class UserSerializer(serializers.ModelSerializer):
@@ -216,3 +216,12 @@ class ProfileSerializer(serializers.ModelSerializer):
     #         raise serializers.ValidationError(
     #                 'memberships is not a list of objects'
     #             )
+
+class RedeemTransactionSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.phone')
+    service = serializers.CharField(source='service.title')
+    amount = serializers.DecimalField(max_digits=16, decimal_places=6, read_only=True)
+    created_at = serializers.DateTimeField()
+    class Meta:
+        model = RedeemTransaction
+        fields = ('id', 'user', 'service', 'amount', 'created_at')

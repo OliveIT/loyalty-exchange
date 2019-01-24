@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from services.models import Service, CurrencyRate, MyUser, UserProfile, Membership
+from services.models import Service, CurrencyRate, MyUser, UserProfile, Membership, RedeemTransaction
 from services.permissions import IsAdminOrReadOnly
-from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer,ProfileSerializer,MembershipSerializer
+from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer,ProfileSerializer,MembershipSerializer, RedeemTransactionSerializer
 
 import json
 import requests
@@ -89,3 +89,17 @@ class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
         for cur in supported_currencies:
             rates[cur] = self.get_rate(cur)
         return Response(data=rates)
+
+class RedeemTransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = RedeemTransaction.objects.all()
+    serializer_class = RedeemTransactionSerializer
+    
+    def get_queryset(self):
+        queryset = RedeemTransaction.objects.all()
+        user = self.request.query_params.get('user', None)
+        if user is not None:
+            queryset = queryset.filter(user=user)
+        service = self.request.query_params.get('service', None)
+        if service is not None:
+            queryset = queryset.filter(service=service)
+        return queryset

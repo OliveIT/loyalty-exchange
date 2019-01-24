@@ -3,8 +3,8 @@ from django.conf import settings
 from django.core import serializers
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from services.models import Service, UserProfile, Membership
-from services.serializers import ServiceSerializer, ProfileSerializer, MembershipSerializer
+from services.models import Service, UserProfile, Membership, RedeemTransaction
+from services.serializers import ServiceSerializer, ProfileSerializer, MembershipSerializer, RedeemTransactionSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -263,6 +263,9 @@ class RedeemPoints(APIView):
                             if remaining <= 0:
                                 break
                     # store history
+                    tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=service)
+                    tx.save()
+
                     updated_customer_status = update_a_customer(pk=user_id)
 
                     return Response({'update': updated_customer_status}, status=status.HTTP_200_OK)

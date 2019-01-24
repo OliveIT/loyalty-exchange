@@ -130,8 +130,8 @@ class UserProfile(models.Model):
         related_name='members'
     )
     is_active = models.BooleanField(default=True)
-    # install_ts = models.DateTimeField(auto_now_add=True)
-    # update_ts = models.DateTimeField(auto_now_add=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now_add=True)
     #####
 
     def __str__(self):
@@ -162,8 +162,8 @@ class Membership(models.Model):
     rate = models.DecimalField(default=0, max_digits=16, decimal_places=6)
     identifier = models.CharField(max_length=100, blank=True, default='')
     #date_of_joining = models.DateTimeField()
-    install_ts = models.DateTimeField(auto_now_add=True, null=True)
-    update_ts = models.DateTimeField(auto_now_add=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.service.title + ' ' + self.profile.email + ' ' + self.points + ' pts'
@@ -176,4 +176,10 @@ class Membership(models.Model):
 class CurrencyRate(models.Model):
     currency = models.CharField(default='USD', max_length=100)
     rate = models.CharField(default='1', max_length=100)
-    updated_ts = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
+
+class RedeemTransaction(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    amount = models.DecimalField(default=0, max_digits=16, decimal_places=6)
+    created_at = models.DateTimeField(auto_now_add=True)
