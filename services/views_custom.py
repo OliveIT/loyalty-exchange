@@ -28,19 +28,22 @@ from web3.contract import ConciseContract
 # from web3.providers.eth_tester import EthereumTesterProvider
 
 def update_a_customer(pk, eth=False):
-    factory = APIRequestFactory()
-    request = factory.get('/')
+    # FIXME when we use hyperlinkedserializer
+    # factory = APIRequestFactory()
+    # request = factory.get('/')
 
-    serializer_context = {
-        'request': Request(request),
-    }
-    serializer = ProfileSerializer(instance = UserProfile.objects.get(pk=pk), context=serializer_context)
+    # serializer_context = {
+    #     'request': Request(request),
+    # }
+    # serializer = ProfileSerializer(instance = UserProfile.objects.get(pk=pk), context=serializer_context)
+    serializer = ProfileSerializer(UserProfile.objects.get(pk=pk))
+
     # FIXME swallow copy?
     profile_data = dict(serializer.data)
     total = Decimal(profile_data['extra_points'])
     for membership in profile_data['memberships']:
-        membership['real'] = Decimal(membership['points']) * Decimal(membership['rate'])
-        total += Decimal(membership['real'])
+        membership['real_points'] = Decimal(membership['points']) * Decimal(membership['rate'])
+        total += Decimal(membership['real_points'])
     profile_data['total'] = total
     # TODO remove useless properties
     del profile_data['services']
@@ -65,10 +68,10 @@ def fetchAPI(service):
     print("service.api_url " + service.api_url)
 
     json_data = open(settings.BASE_DIR + '/services/fixtures/memberships.json')   
-    data1 = json.load(json_data) # deserialises it
+    deserialised = json.load(json_data) # deserialises it
     # data2 = json.dumps(json_data) # json formatted string
     ret = {"result": "ok", "data": []}
-    for membership in data1:
+    for membership in deserialised:
         if membership['fields']['service_id'] == service.pk:
             ret['data'].append(membership['fields'])
 
@@ -146,58 +149,12 @@ class GetPoints(APIView):
                 #     break
                 # member = membership.profile
                 # print(membership.identifier)
-            break
+            
 
             # print(service.pk)
             # print( Membership.objects.filter(service__pk = 3) )
 
         return Response(update_everyone(), status=status.HTTP_200_OK)
-
-        user_id = request.data.get('user', None)
-        service_id = request.data.get('service', None)
-        identifier = request.data.get('identifier', None)
-        password = request.data.get('password', None)
-        flag_save_id = request.data.get('save_id', False)
-
-        error_msg = {
-            "details": "Unexpected Error Occured!"
-        }
-
-        if user_id and service_id and identifier and password:
-            # Membership.objects.get(pk=1)
-            service = Service.objects.get(pk=service_id)
-            profile = UserProfile.objects.get(pk=user_id)
-            # user first() method to get model object from array
-            membership = Membership.objects.filter(profile=user_id, service=service_id).first()
-            if service and profile and membership:
-                try:
-                    # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
-                    res = requests.post('http://localhost:37037/api/service/points/get', data=request.data)
-                    if res.status_code == 200 or res.status_code == 201:
-                        # success
-                        retval = res.json()
-                        diff = retval['points'] - membership.points
-                        # if diff > 0:
-                        #     self.mint_token(address=membership.profile.wallet, amount=diff)
-
-                        membership.points = retval['points']
-                        if flag_save_id:
-                            membership.identifier = identifier
-                        membership.save()
-                        
-
-                        retval = serializers.serialize('json', [ membership, ])
-                        return Response(retval, status=status.HTTP_201_CREATED)
-                    # error code
-                    error_msg['details'] = res.json()
-                except (requests.ConnectionError, requests.Timeout, requests.exceptions.HTTPError) as e:
-                    # exception
-                    error_msg['details'] = str(e)
-            else:
-                error_msg['details'] = "User or Service not found or user isn't a member of the service!"
-        else:
-            error_msg['details'] = "user, service, identifier, password fields are required!"
-        return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
         # serializer = MembershipSerializer(data=request.data)
         # if serializer.is_valid():
@@ -205,36 +162,9 @@ class GetPoints(APIView):
             # serializer.save()
 
 
-
-class RedeemPoints(APIView):
-    """
-    Send request to Service Provider's api url and get point value.
-    """
-
-    # def get(self, request, format=None):
-    #     services = Service.objects.all()
-    #     serializer = ServiceSerializer(services, many=True)
-    #     return Response(serializer.data)
-
-    def post(self, request, format=None):
-        user_id = request.data.get('user', None)
-        service_id = request.data.get('service', None)
-        identifier = request.data.get('identifier', None)
-        password = request.data.get('password', None)
-        flag_save_id = request.data.get('save_id', False)
-        amount = request.data.get('amount', 0)
-
-        error_msg = {
-            "details": "Unexpected Error Occured!"
-        }
-
-        if user_id and service_id and identifier and password and amount >= 1:
-            # Membership.objects.get(pk=1)
-            service = Service.objects.get(pk=service_id)
-            profile = UserProfile.objects.get(pk=user_id)
-            # user first() method to get model object from array
-            membership = Membership.objects.filter(profile=user_id, service=service_id).first()
-            if service and profile and membership:
+def sort_func(e):
+    return e['real_points']
+"""
                 try:
                     # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
                     res = requests.post('http://localhost:37037/api/service/points/redeem', data=request.data)
@@ -253,10 +183,96 @@ class RedeemPoints(APIView):
                     # exception
                     # TRICK str()
                     error_msg['details'] = str(e)
+"""
+
+def deduct_from_service(user_id, service_id, amount):
+    membership = Membership.objects.filter(profile=user_id, service=service_id).first()
+    real_points = membership.calc_real_points()
+
+    if real_points >= amount:
+        deducted_amount = real_points - amount
+        membership.points = deducted_amount / membership.rate
+        membership.save()
+        return 0
+    membership.points = 0
+    membership.save()
+    return amount - real_points
+
+def deduct_from_extra_points(user_id, amount):
+    profile = UserProfile.objects.get(pk=user_id)
+    extra_points = profile.extra_points
+    if extra_points >= amount:
+        deducted_amount = extra_points - amount
+        profile.extra_points = deducted_amount
+        profile.save()
+        return 0
+    profile.extra_points = 0
+    profile.save()
+    return amount - extra_points
+
+class RedeemPoints(APIView):
+    """
+    Send request to Service Provider's api url and get point value.
+    """
+
+    # def get(self, request, format=None):
+    #     services = Service.objects.all()
+    #     serializer = ServiceSerializer(services, many=True)
+    #     return Response(serializer.data)
+
+    def post(self, request, format=None):
+        user_id = request.data.get('user', None)
+        service_id = request.data.get('service', None)
+        amount = request.data.get('amount', 0)
+
+        error_msg = {
+            "details": "Unexpected Error Occured!"
+        }
+
+        if user_id and service_id and amount >= 1:
+            # Membership.objects.get(pk=1)
+            service = Service.objects.get(pk=service_id)
+            profile = UserProfile.objects.get(pk=user_id)
+            # user first() method to get model object from array
+            if service and profile:
+                
+                customer_status = update_a_customer(pk=user_id)
+                amount = Decimal(amount)
+
+                if customer_status['total'] >= amount:
+                    # 1. point of this service
+                    # 2. extra points
+                    # 3. deduct from other services with less real points first
+                    # 4. store transaction history
+                    # membership_for_current_service = Membership.objects.filter(profile=user_id, service=service_id).first()
+                    remaining = amount
+                    for idx, membership in enumerate(customer_status['memberships']):
+                        if(membership['service'] == service_id):
+                            remaining = deduct_from_service(user_id, service_id, remaining)
+                            # now remove this membership from snapshot
+                            del customer_status['memberships'][idx]
+                            break
+
+                    if remaining > 0:
+                        remaining = deduct_from_extra_points(user_id, remaining)
+                    
+                    if remaining > 0:
+                        customer_status['memberships'].sort(key = sort_func)
+                        for membership in customer_status['memberships']:
+                            remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
+                            if remaining <= 0:
+                                break
+                    # store history
+                    updated_customer_status = update_a_customer(pk=user_id)
+
+                    return Response({'update': updated_customer_status}, status=status.HTTP_200_OK)
+                else:
+                    error_msg['details'] = "Not enough points!"
+
             else:
-                error_msg['details'] = "User or Service not found or user isn't a member of the service!"
+                error_msg['details'] = "User or Service not found!"
         else:
-            error_msg['details'] = "user, service, identifier, password, positive amount fields are required!"
+            error_msg['details'] = "user, service, amount > 1 fields are required!"
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
 class TotalPoints(APIView):

@@ -6,7 +6,7 @@
 			"identifier": "google-one-A",
 			"service_id": 1,
 			"profile_id": 1,
-			"points": 3,
+			"points": 2,
 			"rate": 10
 		}
 	},
@@ -39,7 +39,7 @@
 			"identifier": "amazon-one-A",
 			"service_id": 2,
 			"profile_id": 1,
-			"points": 2,
+			"points": 3,
 			"rate": 20
 		}
 	},

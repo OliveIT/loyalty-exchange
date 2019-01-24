@@ -11,6 +11,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 # to generate eth wallet
 import random
 import string
+from decimal import Decimal
 from eth_account import Account
 
 class MyUserManager(BaseUserManager):
@@ -168,6 +169,9 @@ class Membership(models.Model):
         return self.service.title + ' ' + self.profile.email + ' ' + self.points + ' pts'
     class Meta:
         unique_together = (('profile', 'service'),)
+
+    def calc_real_points(self):
+        return Decimal(self.points) * Decimal(self.rate)
 
 class CurrencyRate(models.Model):
     currency = models.CharField(default='USD', max_length=100)

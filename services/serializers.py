@@ -53,14 +53,14 @@ class UserSerializer(serializers.ModelSerializer):
 #                   'is_opened', 'service_type', 'country', 'subscribers')
 
 
-class ServiceSerializer(serializers.HyperlinkedModelSerializer):
+class ServiceSerializer(serializers.ModelSerializer):
     # owner = serializers.ReadOnlyField(source='owner.username')
     # highlight = serializers.HyperlinkedIdentityField(
     #     view_name='service-highlight', format='html')
 
     class Meta:
         model = Service
-        fields = ('url', 'id', 'title', 'description', #'highlight', 'owner'
+        fields = ('id', 'title', 'description', #'highlight', 'owner'
                   'service_type', 'country','is_opened', 'api_url' )#, 'subscribers')
 
     """
@@ -138,18 +138,19 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         model = CurrencyRate
         fields = ('id',  'currency', 'rate' )
 
-class MembershipSerializer(serializers.HyperlinkedModelSerializer):
+class MembershipSerializer(serializers.ModelSerializer):
     # service = ServiceSerializer()   # to inlude details of service
     class Meta:
         model = Membership
         # fields = '__all__'
-        fields = ('url', 'identifier', 'points', 'rate', 'profile', 'service' ) 
+        fields = ('identifier', 'points', 'rate', 'profile', 'service' ) 
         read_only_fields = ('points', 'rate',)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source='user.id')
     email = serializers.ReadOnlyField(source='user.email')
+    extra_points = serializers.DecimalField(max_digits=16, decimal_places=6)
     services = ServiceSerializer(many=True, read_only=True)
     memberships = MembershipSerializer(source='membership', many=True, read_only=True)
     class Meta:
