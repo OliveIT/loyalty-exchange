@@ -80,7 +80,7 @@ STYLE_CHOICES = sorted([(item, item) for item in STYLES])
 COUNTRY_CHOICES = sorted((item, item) for item in COUNTRIES)
 
 class Service(models.Model):
-    title = models.CharField(max_length=100, blank=False, default='')
+    title = models.CharField(max_length=100, blank=False, null=True, unique=True)
     description = models.TextField()
     service_type = models.CharField(blank=False, max_length=100, default='')
     country = models.CharField(blank=False, max_length=100, default='')
@@ -89,13 +89,13 @@ class Service(models.Model):
     #     'auth.User', related_name='services', on_delete=models.CASCADE)
     contact = models.TextField()
     api_url = models.CharField(max_length=300, blank=False, default='')
-    created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return self.title
 
     class Meta:
-        ordering = ('created', )
+        ordering = ('created_at', )
 
     # def save(self, *args, **kwargs):
         """
@@ -179,7 +179,23 @@ class CurrencyRate(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
 
 class RedeemTransaction(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser,on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     amount = models.DecimalField(default=0, max_digits=16, decimal_places=6)
+    tx_hash = models.CharField(max_length=100, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class TransferTransaction(models.Model):
+    sender = models.ForeignKey(MyUser, related_name="sending_user", on_delete=models.CASCADE)
+    receiver = models.ForeignKey(MyUser, related_name="receiving_user", on_delete=models.CASCADE)
+    amount = models.DecimalField(default=0, max_digits=16, decimal_places=6)
+    confirmed = models.BooleanField (
+        'confirmed',
+        default=False,
+        help_text= 'User should click the link sent to their email',
+    )
+    otp_code = models.CharField(max_length=100, blank=False)
+    status = models.CharField(max_length=100, blank=False, default='Unconfirmed')
+    burn_tx_hash = models.CharField(max_length=100, blank=True, default='')
+    mint_tx_hash = models.CharField(max_length=100, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)

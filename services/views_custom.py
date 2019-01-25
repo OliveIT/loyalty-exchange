@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from services.models import Service, UserProfile, Membership, RedeemTransaction
+from services.models import Service, UserProfile, Membership, RedeemTransaction, TransferTransaction
 from services.serializers import ServiceSerializer, ProfileSerializer, MembershipSerializer, RedeemTransactionSerializer
 from django.http import Http404
 from rest_framework.views import APIView
@@ -12,6 +12,15 @@ from rest_framework import status
 import requests
 import json
 import os, sys, inspect
+import random
+import string
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .tokens import account_activation_token
+from django.core.mail import EmailMessage
 
 from decimal import Decimal
 
@@ -20,6 +29,8 @@ from rest_framework.parsers import JSONParser
 
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
+
+from services.helpers.web3helper import web3helper
 
 # from web3.providers.eth_tester import EthereumTesterProvider
 
@@ -33,11 +44,11 @@ from rest_framework.test import APIRequestFactory
 # nonce = w3.eth.getTransactionCount('0x5ce9454909639D2D17A3F753ce7d93fa0b9aB12E')
 # admin_private = "0xaaaaaaaaaaaaaaaaaaaaa"
 
-def mint_token(address, amount):
-    # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
-    tx_hash = concise_contract.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
-    self.w3.eth.waitForTransactionReceipt(tx_hash)
-    pass
+# def mint_token(address, amount):
+#     # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
+#     tx_hash = concise_contract.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
+#     self.w3.eth.waitForTransactionReceipt(tx_hash)
+#     pass
 
 def update_a_customer(pk, eth=False):
     # FIXME when we use hyperlinkedserializer
@@ -77,18 +88,21 @@ def update_everyone(eth=False):
     return res
 
 def fetchAPI(service):
-    # res = requests.get(service.api_url, data=None)
-    print("service.api_url " + service.api_url)
+    res = requests.get('http://199.192.26.112/API/listmerchantcustomer/',
+            data={ "merchID": 10 })
+    # print("service.api_url " + service.api_url)
 
-    json_data = open(settings.BASE_DIR + '/services/fixtures/memberships.json')   
-    deserialised = json.load(json_data) # deserialises it
+    # json_data = open(settings.BASE_DIR + '/services/fixtures/memberships.json')
+    # deserialised = json.load(json_data) # deserialises it
     # data2 = json.dumps(json_data) # json formatted string
+
+    deserialised = json.load(res) # deserialises it
     ret = {"result": "ok", "data": []}
     for membership in deserialised:
         if membership['fields']['service_id'] == service.pk:
             ret['data'].append(membership['fields'])
 
-    json_data.close()
+    # json_data.close()
     return ret
 
     # response = {
@@ -139,6 +153,9 @@ class GetPoints(APIView):
         #     data fetch from service
         #     for service.members
         #         
+        # web3helper = Web3Helper()
+        # web3helper.mint_token("")
+        
         services = Service.objects.all()
         for service in services: # all services
                        
@@ -293,6 +310,35 @@ class RedeemPoints(APIView):
             error_msg['details'] = "user, service, amount > 1 fields are required!"
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
+def create_new_transfer_tx(sender, receiver, amount, current_site="example.com"):
+    # https://medium.com/@frfahim/django-registration-with-confirmation-email-bb5da011e4ef
+    # otp_code = account_activation_token.make_token(sender)
+    otp_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
+
+    tx = TransferTransaction(
+        id=None,
+        sender=sender,
+        receiver=receiver,
+        amount=amount,
+        otp_code=otp_code
+    )
+    tx.save()
+
+    mail_subject = 'Confirm the transfer of your Loyalty Points.'
+    message = render_to_string('confirm_transfer_email.html', {
+        'sender': sender,
+        'receiver': receiver,
+        'domain': current_site.domain,
+        'amount': amount,
+        # 'uid':urlsafe_base64_encode(force_bytes(sender.pk)),
+        'token':otp_code,
+    })
+    email = EmailMessage(
+        mail_subject, message, to=[sender.email]
+    )
+    email.send()
+    pass
+
 
 class TransferPoints(APIView):
     """
@@ -324,30 +370,9 @@ class TransferPoints(APIView):
                 amount = Decimal(amount)
 
                 if sender_status['total'] >= amount:
-                    # 1. extra_points
-                    # 2. deduct from services increasing order of real points
-                    # 3. increase receiver's extra_points
-                    remaining = amount
-
-                    if remaining > 0 and sender.extra_points > 0:
-                        remaining = deduct_from_extra_points(sender_id, remaining)
-                    
-                    if remaining > 0:
-                        sender_status['memberships'].sort(key = sort_func)
-                        for membership in sender_status['memberships']:
-                            remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
-                            if remaining <= 0:
-                                break
-                    
-                    receiver.extra_points += amount
-                    receiver.save()
-                    # store history
-                    # tx = RedeemTransaction(id=None, amount=amount, user=sender.user, service=service)
-                    # tx.save()
-
-                    updated_customer_status = update_a_customer(pk=sender_id)
-
-                    return Response({'update': updated_customer_status}, status=status.HTTP_200_OK)
+                    current_site = get_current_site(request)
+                    create_new_transfer_tx(sender = sender.user, receiver=receiver.user, amount=amount, current_site=current_site)
+                    return Response({'message': "Confirmation Email Sent!"}, status=status.HTTP_200_OK)
                 else:
                     error_msg['details'] = "Not enough points!"
             else:
@@ -355,6 +380,77 @@ class TransferPoints(APIView):
         else:
             error_msg['details'] = "sender, receiver's ID, amount > 1 fields are required!"
 
+        return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+class ConfirmTransferPoints(APIView):
+    """
+    Send request to Service Provider's api url and get point value.
+    """
+
+    # def get(self, request, format=None):
+    #     services = Service.objects.all()
+    #     serializer = ServiceSerializer(services, many=True)
+    #     return Response(serializer.data)
+
+    def post(self, request, format=None):
+        otp = request.data.get('otp', None)
+
+        error_msg = {
+            "details": "Unexpected Error Occured!"
+        }
+
+        while True:
+            if not otp:
+                error_msg['details'] = "Confirmation Code is missing!"
+                break
+
+            transfer_tx = TransferTransaction.objects.get(otp_code=otp)
+
+            if not transfer_tx:
+                error_msg['details'] = "Invalid Confirmation Code!"
+                break
+            
+            if transfer_tx.confirmed:
+                error_msg['details'] = "Transfer Transaction is already confirmed!"
+                break
+
+            transfer_tx.confirmed = True
+            transfer_tx.status = "Confirmed"
+            transfer_tx.save()
+            
+            sender = UserProfile.objects.get(user=transfer_tx.sender)
+            receiver = UserProfile.objects.get(user=transfer_tx.receiver)
+            # user first() method to get model object from array
+            amount = transfer_tx.amount
+
+            sender_status = update_a_customer(pk=transfer_tx.sender)
+
+            if sender_status['total'] < amount:
+                error_msg['details'] = "Not enough points!"
+                break
+
+            # 1. extra_points
+            # 2. deduct from services increasing order of real points
+            # 3. increase receiver's extra_points
+
+            remaining = amount
+
+            if remaining > 0 and sender.extra_points > 0:
+                remaining = deduct_from_extra_points(sender_id, remaining)
+            
+            if remaining > 0:
+                sender_status['memberships'].sort(key = sort_func)
+                for membership in sender_status['memberships']:
+                    remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
+                    if remaining <= 0:
+                        break
+            
+            receiver.extra_points += amount
+            receiver.save()
+
+            sender_status = update_a_customer(pk=transfer_tx.sender)
+            return Response(sender_status, status=status.HTTP_200_OK)
+        # end-while
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
 

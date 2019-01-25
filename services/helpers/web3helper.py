@@ -16,21 +16,19 @@ class Web3Helper:
             abi=self.abi)
         self.concise_contract = ConciseContract(self.contract)
 
-        self.admin_account = self.w3.eth.account.privateKeyToAccount(os.getenv('admin_secret_key', ''))
+        self.admin_account = self.w3.eth.account.privateKeyToAccount(os.getenv('ADMIN_ETH_SECRET', ''))
         pass
 
     def mint_token(self, address, amount):
         nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
-        self.contract.functions.mint(adderss, amount).buildTransaction({
+        mintTx = self.contract.functions.mint(address, amount).buildTransaction({
             'chainId': 3,
             'gas': 70000,
             'gasPrice': self.w3.toWei('1', 'gwei'),
             'nonce': nonce,
         })
-        signed_txn = w3.eth.account.signTransaction(unicorn_txn, private_key=private_key)
-        
-        admin_private = "0xaaaaaaaaaaaaaaaaaaaaa"
-        # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
-        tx_hash = self.concise.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
-        self.w3.eth.waitForTransactionReceipt(tx_hash)
+        signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
+        self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
         pass
+
+web3helper = Web3Helper()

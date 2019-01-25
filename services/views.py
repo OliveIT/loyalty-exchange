@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from services.models import Service, CurrencyRate, MyUser, UserProfile, Membership, RedeemTransaction
+from services.models import Service, CurrencyRate, MyUser, UserProfile, Membership, RedeemTransaction, TransferTransaction
 from services.permissions import IsAdminOrReadOnly
-from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer,ProfileSerializer,MembershipSerializer, RedeemTransactionSerializer
+from services.serializers import ServiceSerializer, UserSerializer, CurrencyRateSerializer,ProfileSerializer,MembershipSerializer, RedeemTransactionSerializer, TransferTransactionSerializer
 
 import json
 import requests
@@ -103,3 +103,7 @@ class RedeemTransactionViewSet(viewsets.ReadOnlyModelViewSet):
         if service is not None:
             queryset = queryset.filter(service=service)
         return queryset
+
+class TransferTransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = TransferTransaction.objects.all()
+    serializer_class = TransferTransactionSerializer

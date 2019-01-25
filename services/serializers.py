@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 from django.db import IntegrityError, transaction
-from services.models import Service, Membership, CurrencyRate, MyUser, UserProfile, RedeemTransaction
+from services.models import Service, Membership, CurrencyRate, MyUser, UserProfile, RedeemTransaction, TransferTransaction
 from rest_auth.serializers import UserDetailsSerializer
 
 class UserSerializer(serializers.ModelSerializer):
@@ -226,3 +226,14 @@ class RedeemTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RedeemTransaction
         fields = ('id', 'user', 'service', 'amount', 'created_at')
+
+class TransferTransactionSerializer(serializers.ModelSerializer):
+    sender = serializers.CharField(source='sender.phone')
+    receiver = serializers.CharField(source='receiver.phone')
+    amount = serializers.DecimalField(max_digits=16, decimal_places=6, read_only=True)
+    confirmed = serializers.BooleanField()
+    status = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    class Meta:
+        model = TransferTransaction
+        fields = ('id', 'sender', 'receiver', 'amount', 'confirmed', 'status', 'created_at')
