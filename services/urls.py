@@ -12,7 +12,7 @@ router.register(r'service', views.ServiceViewSet)
 router.register(r'membership', views.MembershipViewSet)
 router.register(r'currency_rate', views.CurrencyRateViewSet)
 router.register(r'redeem_transactions', views.RedeemTransactionViewSet)
-router.register(r'transfer_transactions', views.TransferTransactionViewSet)
+# router.register(r'transfer_transactions', views.TransferTransactionViewSet)
 
 # The API URLs are now determined automatically by the router.
 # Additionally, we include the login URLs for the browsable API.
