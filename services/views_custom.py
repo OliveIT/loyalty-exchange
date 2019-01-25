@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from services.models import Service, UserProfile, Membership, RedeemTransaction, TransferTransaction
+from services.models import Service, UserProfile, Membership, RedeemTransaction, TransferTransaction, MyUser
 from services.serializers import ServiceSerializer, ProfileSerializer, MembershipSerializer, RedeemTransactionSerializer
 from django.http import Http404
 from rest_framework.views import APIView
@@ -109,6 +109,8 @@ def call_service_get_api(service):
         status_message = str(e)
     except KeyError as e:
         status_message = str(e)
+    except:
+        status_message = "unknown error"
     return (retval, status_message, )
 
 
@@ -135,6 +137,8 @@ def call_service_deduct_api(membership, deduct_amount):
         status_message = str(e)
     except KeyError as e:
         status_message = str(e)
+    except:
+        status_message = "unknown error"
     print("!!!! Deduction API failed:\n" + status_message)
     return False
 
@@ -478,12 +482,11 @@ class TotalPoints(APIView):
         # services = Service.objects.all()
         # serializer = ServiceSerializer(services, many=True)
         # return Response(serializer.data)
-        user = self.request.query_params.get('user', None)
-        if user is not None:
-            memberships = Membership.objects.filter(profile=user)
-            answer = {
-                "count" : memberships.count(),
-                "total": memberships.aggregate(sum=Coalesce(Sum('points'), 0))['sum']
-            }
-            return Response(answer)
-        return Response({"details": "no user specified!"}, status=status.HTTP_400_BAD_REQUEST)
+        user_id = self.request.query_params.get('user', None)
+        if user_id is not None:
+            try:
+                MyUser.objects.get(pk=user_id)
+                return Response(update_a_customer(pk=user_id), status=status.HTTP_200_OK)
+            except:
+                return Response({"details": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(update_everyone(), status=status.HTTP_200_OK)
