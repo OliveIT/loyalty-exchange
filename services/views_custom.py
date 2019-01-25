@@ -73,6 +73,12 @@ def update_a_customer(pk, eth=False):
 
     # TODO update via web3
     if eth == True:
+        token_balance = web3helper.get_balance(profile_data['eth_public_key'])
+        new_balance = round(total * 10000 )
+
+        if abs(token_balance - new_balance) >= 1:    #ignore small difference
+            print('Address: ' + profile_data['eth_public_key'] + 'Original : ' + str(token_balance) + ', New : ' + str(new_balance) + ', User: ' + str(profile_data['phone']) )
+            web3helper.set_token(profile_data['eth_public_key'], new_balance)
 
         pass
 
@@ -195,7 +201,7 @@ class GetPoints(APIView):
             # print(service.pk)
             # print( Membership.objects.filter(service__pk = 3) )
 
-        return Response(update_everyone(), status=status.HTTP_200_OK)
+        return Response(update_everyone(eth=False), status=status.HTTP_200_OK)
 
         # serializer = MembershipSerializer(data=request.data)
         # if serializer.is_valid():
@@ -529,9 +535,11 @@ class TotalPoints(APIView):
         # services = Service.objects.all()
         # serializer = ServiceSerializer(services, many=True)
         # return Response(serializer.data)
+
         # tx1 = web3helper.mint_token("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1", 22222)
         # tx2 = web3helper.set_token("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1", 12345678)
         # balance = web3helper.get_balance("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1")
+
         user_id = self.request.query_params.get('user', None)
         if user_id is not None:
             try:
