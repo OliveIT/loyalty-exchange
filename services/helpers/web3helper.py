@@ -32,3 +32,10 @@ class Web3Helper:
         pass
 
 web3helper = Web3Helper()
+
+
+    # def mint_token(self, address, amount):
+    #     # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
+    #     tx_hash = self.concise.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
+    #     self.w3.eth.waitForTransactionReceipt(tx_hash)
+    #     pass

@@ -82,44 +82,62 @@ def update_a_customer(pk, eth=False):
 def update_everyone(eth=False):
     res = []
     for profile in UserProfile.objects.all():
-        res.append(update_a_customer(pk = profile.pk, eth=eth))
+        if not profile.user.is_superuser:
+            res.append(update_a_customer(pk = profile.pk, eth=eth))
 
     # content = JSONRenderer().render(res)
     return res
 
-def fetchAPI(service):
-    res = requests.get('http://199.192.26.112/API/listmerchantcustomer/',
-            data={ "merchID": 10 })
+def call_service_get_api(service):
+    # res = requests.get('http://199.192.26.112/API/listmerchantcustomer/',data={ "merchID": 10 })
     # print("service.api_url " + service.api_url)
+    status_message = "ok"
+    retval = {}
+    try:
+        # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
+        res = requests.get(service.api_url)
+        if res.ok:
+            # success
+            retval = res.json()
+            retval = retval['data']
+            return (retval, status_message, )
+        # error code
+        status_message = "something's wrong at service side"
+    except (requests.ConnectionError, requests.Timeout, requests.exceptions.HTTPError) as e:
+        status_message = str(e)
+    except ValueError as e:
+        status_message = str(e)
+    except KeyError as e:
+        status_message = str(e)
+    return (retval, status_message, )
 
-    # json_data = open(settings.BASE_DIR + '/services/fixtures/memberships.json')
-    # deserialised = json.load(json_data) # deserialises it
-    # data2 = json.dumps(json_data) # json formatted string
 
-    deserialised = json.load(res) # deserialises it
-    ret = {"result": "ok", "data": []}
-    for membership in deserialised:
-        if membership['fields']['service_id'] == service.pk:
-            ret['data'].append(membership['fields'])
+def call_service_deduct_api(membership, deduct_amount):
+    status_message = "ok"
+    try:
+        # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
+        # https://www.google.com/url?q=http://199.192.26.112/API/listmerchantcustomer/?merchID%3D10%26amount%3D0%26serviceID%3DFacebook%26customerIdentifier%3D%2B120000001&sa=D&source=hangouts&ust=1548481890248000&usg=AFQjCNGnu-b-JPsHSGvqNgK2raGQRCyuRQ
+        res = requests.get(url=membership.service.api_url, params = {
+            "amount" : deduct_amount,
+            "serviceID" : membership.service.title,
+            "customerIdentifier": str(membership.profile.user.phone)
+        })
+        if res.ok:
+            # success
+            retval = res.json()  # check if json
+            retval = retval['data']  # check if there's data field
+            return True
+        # error code
+        status_message = "Something's wrong at service side"
+    except (requests.ConnectionError, requests.Timeout, requests.exceptions.HTTPError) as e:
+        status_message = str(e)
+    except ValueError as e:
+        status_message = str(e)
+    except KeyError as e:
+        status_message = str(e)
+    print("!!!! Deduction API failed:\n" + status_message)
+    return False
 
-    # json_data.close()
-    return ret
-
-    # response = {
-            #     "result": "ok",
-            #     "data": [{  "points": 123.43,
-            #         "rate": 2.5,
-            #         "customerIdentifier":"dry2",
-            #         "serviceID":"Midastouchdrycleaners"},
-            #     {   "points": 100.43,
-            #         "rate": 2.5,
-            #         "customerIdentifier":"dry4",
-            #         "serviceID":"Midastouchdrycleaners" },
-            #     {   "points": 43.632,
-            #         "rate": 2.5,
-            #         "customerIdentifier":"dry5",
-            #         "serviceID":"Midastouchdrycleaners" }
-            #     ]}
 
 class GetPoints(APIView):
     """
@@ -131,24 +149,7 @@ class GetPoints(APIView):
     #     serializer = ServiceSerializer(services, many=True)
     #     return Response(serializer.data)
 
-    def __init__(self):
-        self.w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
-        with open(str( os.getcwd() + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
-            self.abi = json.load(abi_definition)['abi']
-        self.contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
-        self.contract = self.w3.eth.contract(
-            address=self.contract_address,
-            abi=self.abi)
-        self.concise = ConciseContract(self.contract)
-        pass
-
-    def mint_token(self, address, amount):
-        # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
-        tx_hash = self.concise.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
-        self.w3.eth.waitForTransactionReceipt(tx_hash)
-        pass
-
-    def post(self, request, format=None):
+    def get(self, request, format=None):
         # for services
         #     data fetch from service
         #     for service.members
@@ -158,17 +159,22 @@ class GetPoints(APIView):
         
         services = Service.objects.all()
         for service in services: # all services
-                       
-            response = fetchAPI(service)
+
+            response, status_message = call_service_get_api(service)
+            if status_message != 'ok':
+                print(service.title + "'s API is not working.")
+                print(status_message)
+                continue
+
             # members of current service
             memberships = Membership.objects.filter(service=service.pk)
 
             for membership in memberships:
                 # check if this guy is included in the response
                 # isFound = False
-                for res in response['data']:
+                for res in response:
+                    if res['customerIdentifier'] == membership.profile.user.phone:
                     # if res['customerIdentifier'] == membership.identifier:
-                    if res['identifier'] == membership.identifier:
                         # isFound = True
                         membership.points = res['points']
                         membership.rate = res['rate']
@@ -220,13 +226,22 @@ def deduct_from_service(user_id, service_id, amount):
     membership = Membership.objects.filter(profile=user_id, service=service_id).first()
     real_points = membership.calc_real_points()
 
+    if real_points == 0:    # don't waste electricity
+        return amount # ignore
+
     if real_points >= amount:
+        # deduct   amount / membership.rate from service
+        if not call_service_deduct_api(membership, amount / membership.rate):
+            return amount # ignore
+
         deducted_amount = real_points - amount
         membership.points = deducted_amount / membership.rate
         membership.save()
 
-        # deduct   amount / membership.rate
         return 0
+    # deduct  membership.points from service
+    if not call_service_deduct_api(membership, membership.points):
+        return amount  # ignore
     membership.points = 0
     membership.save()
     return amount - real_points
