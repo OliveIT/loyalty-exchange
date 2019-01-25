@@ -5,7 +5,7 @@
 .*
 env
 /temp/**
-/truffle/build/**
+# /truffle/build/
 
 
 # Accept these files in the repository
