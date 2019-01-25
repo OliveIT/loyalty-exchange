@@ -7,7 +7,7 @@ import os
 
 class Web3Helper:
     def __init__(self):
-        self.w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
+        self.w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/" + os.getenv('ADMIN_INFURA_API', '')))
         with open(str( settings.BASE_DIR + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
             self.abi = json.load(abi_definition)['abi']
         self.contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
@@ -15,7 +15,6 @@ class Web3Helper:
             address=self.contract_address,
             abi=self.abi)
         self.concise_contract = ConciseContract(self.contract)
-
         self.admin_account = self.w3.eth.account.privateKeyToAccount(os.getenv('ADMIN_ETH_SECRET', ''))
         pass
 
