@@ -529,6 +529,9 @@ class TotalPoints(APIView):
         # services = Service.objects.all()
         # serializer = ServiceSerializer(services, many=True)
         # return Response(serializer.data)
+        # tx1 = web3helper.mint_token("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1", 22222)
+        # tx2 = web3helper.set_token("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1", 12345678)
+        # balance = web3helper.get_balance("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1")
         user_id = self.request.query_params.get('user', None)
         if user_id is not None:
             try:

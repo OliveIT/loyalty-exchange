@@ -19,31 +19,38 @@ class Web3Helper:
         pass
 
     def mint_token(self, address, amount):
-        nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
-        mintTx = self.contract.functions.mint(address, amount).buildTransaction({
-            'chainId': 3,
-            'gas': 700000,
-            'gasPrice': self.w3.toWei('1', 'gwei'),
-            'nonce': nonce,
-        })
-        signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
-        tx_hash = self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
-        return tx_hash
+        try:
+            nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
+            mintTx = self.contract.functions.mint(address, amount).buildTransaction({
+                'chainId': 3,
+                'gas': 100000,
+                'gasPrice': self.w3.toWei('500', 'gwei'),
+                'nonce': nonce,
+            })
+            signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
+            tx_hash = self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+            self.w3.eth.waitForTransactionReceipt(tx_hash, timeout=120)
+        except:
+            return tx_hash
     
     def get_balance(self, address):
         return self.contract.functions.balanceOf(address).call()
 
     def set_token(self, address, amount):
-        nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
-        mintTx = self.contract.functions.control(address, amount).buildTransaction({
-            'chainId': 3,
-            'gas': 700000,
-            'gasPrice': self.w3.toWei('1', 'gwei'),
-            'nonce': nonce,
-        })
-        signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
-        tx_hash = self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
-        return tx_hash
+        try:
+            nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
+            mintTx = self.contract.functions.control(address, amount).buildTransaction({
+                'chainId': 3,
+                'gas': 100000,
+                'gasPrice': self.w3.toWei('500', 'gwei'),
+                'nonce': nonce,
+            })
+            signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
+            tx_hash = self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+            self.w3.eth.waitForTransactionReceipt(tx_hash, timeout=120)
+            return tx_hash
+        except:
+            return False
 
 web3helper = Web3Helper()
 
