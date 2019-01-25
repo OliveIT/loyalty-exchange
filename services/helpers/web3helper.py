@@ -8,9 +8,9 @@ import os
 class Web3Helper:
     def __init__(self):
         self.w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/" + os.getenv('ADMIN_INFURA_API', '')))
-        with open(str( settings.BASE_DIR + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
+        with open(str( settings.BASE_DIR + '/truffle/build/contracts/LoyaltyExchangeToken.json'), 'r') as abi_definition:
             self.abi = json.load(abi_definition)['abi']
-        self.contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
+        self.contract_address = "0x229C016C59879d2E9E752BF0B026b88C2Ad342F0"
         self.contract = self.w3.eth.contract(
             address=self.contract_address,
             abi=self.abi)
@@ -22,13 +22,28 @@ class Web3Helper:
         nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
         mintTx = self.contract.functions.mint(address, amount).buildTransaction({
             'chainId': 3,
-            'gas': 70000,
+            'gas': 700000,
             'gasPrice': self.w3.toWei('1', 'gwei'),
             'nonce': nonce,
         })
         signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
-        self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
-        pass
+        tx_hash = self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+        return tx_hash
+    
+    def get_balance(self, address):
+        return self.contract.functions.balanceOf(address).call()
+
+    def set_token(self, address, amount):
+        nonce = self.w3.eth.getTransactionCount(self.admin_account.address)
+        mintTx = self.contract.functions.control(address, amount).buildTransaction({
+            'chainId': 3,
+            'gas': 700000,
+            'gasPrice': self.w3.toWei('1', 'gwei'),
+            'nonce': nonce,
+        })
+        signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)
+        tx_hash = self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+        return tx_hash
 
 web3helper = Web3Helper()
 

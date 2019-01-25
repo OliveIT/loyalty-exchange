@@ -220,12 +220,19 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class RedeemTransactionSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source='user.phone')
-    service = serializers.CharField(source='service.title')
+    # service = serializers.CharField(source='service.title')
+    service = serializers.SerializerMethodField('get_servicetitle')
+
     amount = serializers.DecimalField(max_digits=16, decimal_places=6, read_only=True)
     created_at = serializers.DateTimeField()
     class Meta:
         model = RedeemTransaction
         fields = ('id', 'user', 'service', 'amount', 'created_at')
+    
+    def get_servicetitle(self, obj):
+        if obj.service == None:
+            return None
+        return obj.service.title
 
 class TransferTransactionSerializer(serializers.ModelSerializer):
     sender = serializers.CharField(source='sender.phone')

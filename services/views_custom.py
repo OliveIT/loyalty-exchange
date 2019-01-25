@@ -122,7 +122,7 @@ def call_service_deduct_api(membership, deduct_amount):
         res = requests.get(url=membership.service.api_url, params = {
             "amount" : deduct_amount,
             "serviceID" : membership.service.title,
-            "customerIdentifier": str(membership.profile.user.phone)
+            "customerIdentifier": str(membership.identifier)
         })
         if res.ok:
             # success
@@ -177,7 +177,7 @@ class GetPoints(APIView):
                 # check if this guy is included in the response
                 # isFound = False
                 for res in response:
-                    if res['customerIdentifier'] == membership.profile.user.phone:
+                    if res['customerIdentifier'] == membership.identifier:
                     # if res['customerIdentifier'] == membership.identifier:
                         # isFound = True
                         membership.points = res['points']
@@ -276,58 +276,105 @@ class RedeemPoints(APIView):
         user_id = request.data.get('user', None)
         service_id = request.data.get('service', None)
         amount = request.data.get('amount', 0)
+        mandatory = request.data.get('mandatory', None)
 
         error_msg = {
             "details": "Unexpected Error Occured!"
         }
 
-        if user_id and service_id and amount >= 1:
-            # Membership.objects.get(pk=1)
-            service = Service.objects.get(pk=service_id)
+        while True:
+            if user_id == None or amount == None or mandatory == None:
+                error_msg['details'] = "User, Amount, Mandatory fields are required!"
+                break
+            if amount < 1:
+                error_msg['details'] = "Amount >= 1"
+                break
+            
             profile = UserProfile.objects.get(pk=user_id)
-            # user first() method to get model object from array
-            if service and profile:
+
+            if not profile:
+                error_msg['details'] = "User not found!"
+                break;
+
+            customer_status = update_a_customer(pk=user_id)
+            amount = Decimal(amount)
+
+            if mandatory == True:
+                if service_id == None:
+                    error_msg['details'] = "Service field is required!"
+                    break
+
+                service = Service.objects.get(pk=service_id)
+                if not service:
+                    error_msg['details'] = "Service not found!"
+                    break
                 
-                customer_status = update_a_customer(pk=user_id)
-                amount = Decimal(amount)
+                service_found = False
+                for idx, membership in enumerate(customer_status['memberships']):
+                    if(membership['service'] == service_id):
+                        service_found = True
+                        break
 
-                if customer_status['total'] >= amount:
-                    # 1. point of this service
-                    # 2. extra points
-                    # 3. deduct from other services with less real points first
-                    # 4. store transaction history
-                    # membership_for_current_service = Membership.objects.filter(profile=user_id, service=service_id).first()
-                    remaining = amount
-                    for idx, membership in enumerate(customer_status['memberships']):
-                        if(membership['service'] == service_id):
-                            remaining = deduct_from_service(user_id, service_id, remaining)
-                            # now remove this membership from snapshot
-                            del customer_status['memberships'][idx]
-                            break
+                if service_found == False:
+                    error_msg['details'] = "This customer is not a member of the service!"
+                    break
 
-                    if remaining > 0 and profile.extra_points > 0:
-                        remaining = deduct_from_extra_points(user_id, remaining)
-                    
-                    if remaining > 0:
-                        customer_status['memberships'].sort(key = sort_func)
-                        for membership in customer_status['memberships']:
-                            remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
-                            if remaining <= 0:
-                                break
-                    # store history
-                    tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=service)
-                    tx.save()
-
-                    updated_customer_status = update_a_customer(pk=user_id)
-
-                    return Response({'update': updated_customer_status}, status=status.HTTP_200_OK)
-                else:
+                if membership['real_points'] < amount:
                     error_msg['details'] = "Not enough points!"
+                    break
+
+                if deduct_from_service(user_id, service_id, amount) > 0:  # call api failed ?!
+                    error_msg['details'] = "Service API call failed! Check API url!"
+                    break
+
+                # store history
+                tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=service)
+                tx.save()
+
+                updated_customer_status = update_a_customer(pk=user_id)
+
+                return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
+
             else:
-                error_msg['details'] = "User or Service not found!"
-        else:
-            error_msg['details'] = "user, service, amount > 1 fields are required!"
+
+                if customer_status['total'] < amount:
+                    error_msg['details'] = "Not enough points!"
+                    break
+                
+                # 1. point of this service
+                # 2. extra points
+                # 3. deduct from other services with less real points first
+                # 4. store transaction history
+                # membership_for_current_service = Membership.objects.filter(profile=user_id, service=service_id).first()
+                remaining = amount
+                # for idx, membership in enumerate(customer_status['memberships']):
+                #     if(membership['service'] == service_id):
+                #         remaining = deduct_from_service(user_id, service_id, remaining)
+                #         # now remove this membership from snapshot
+                #         del customer_status['memberships'][idx]
+                #         break
+
+                if profile.extra_points > 0:
+                    remaining = deduct_from_extra_points(user_id, remaining)
+                
+                if remaining > 0:
+                    customer_status['memberships'].sort(key = sort_func)
+                    for membership in customer_status['memberships']:
+                        remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
+                        if remaining <= 0:
+                            break
+                # store history
+                tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=None)
+                tx.save()
+
+                updated_customer_status = update_a_customer(pk=user_id)
+
+                return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
+            break
+            
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 def create_new_transfer_tx(sender, receiver, amount, current_site="example.com"):
     # https://medium.com/@frfahim/django-registration-with-confirmation-email-bb5da011e4ef

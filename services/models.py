@@ -179,8 +179,8 @@ class CurrencyRate(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
 
 class RedeemTransaction(models.Model):
-    user = models.ForeignKey(MyUser,on_delete=models.CASCADE)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE)
     amount = models.DecimalField(default=0, max_digits=16, decimal_places=6)
     tx_hash = models.CharField(max_length=100, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)

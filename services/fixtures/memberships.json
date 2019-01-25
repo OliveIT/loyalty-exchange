@@ -3,7 +3,7 @@
 		"model": "services.membership",
 		"pk": 1,
 		"fields": {
-			"identifier": "google-one-A",
+			"identifier": "+120000001",
 			"service_id": 1,
 			"profile_id": 1,
 			"points": 2,
@@ -14,7 +14,7 @@
 		"model": "services.membership",
 		"pk": 2,
 		"fields": {
-			"identifier": "google-three-C",
+			"identifier": "+120000003",
 			"service_id": 1,
 			"profile_id": 3,
 			"points": 4,
@@ -25,7 +25,7 @@
 		"model": "services.membership",
 		"pk": 3,
 		"fields": {
-			"identifier": "google-four",
+			"identifier": "+120000004",
 			"service_id": 1,
 			"profile_id": 4,
 			"points": 43.632000,
@@ -36,7 +36,7 @@
 		"model": "services.membership",
 		"pk": 4,
 		"fields": {
-			"identifier": "amazon-one-A",
+			"identifier": "+120000001",
 			"service_id": 2,
 			"profile_id": 1,
 			"points": 3,
@@ -47,7 +47,7 @@
 		"model": "services.membership",
 		"pk": 5,
 		"fields": {
-			"identifier": "amazon-two-B",
+			"identifier": "+120000002",
 			"service_id": 2,
 			"profile_id": 2,
 			"points": 3,
@@ -58,7 +58,7 @@
 		"model": "services.membership",
 		"pk": 6,
 		"fields": {
-			"identifier": "amazon-three-C",
+			"identifier": "+120000003",
 			"service_id": 2,
 			"profile_id": 3,
 			"points": 4,
@@ -69,7 +69,7 @@
 		"model": "services.membership",
 		"pk": 7,
 		"fields": {
-			"identifier": "amazon-five",
+			"identifier": "+120000005",
 			"service_id": 2,
 			"profile_id": 5,
 			"points": 10.42,
@@ -80,7 +80,7 @@
 		"model": "services.membership",
 		"pk": 8,
 		"fields": {
-			"identifier": "microsoft-two-B",
+			"identifier": "+120000002",
 			"service_id": 3,
 			"profile_id": 2,
 			"points": 2,
@@ -91,7 +91,7 @@
 		"model": "services.membership",
 		"pk": 9,
 		"fields": {
-			"identifier": "microsoft-four",
+			"identifier": "+120000004",
 			"service_id": 3,
 			"profile_id": 4,
 			"points": 20.332,
@@ -102,7 +102,7 @@
 		"model": "services.membership",
 		"pk": 10,
 		"fields": {
-			"identifier": "facebook-one-A",
+			"identifier": "+120000001",
 			"service_id": 4,
 			"profile_id": 1,
 			"points": 1,
@@ -113,7 +113,7 @@
 		"model": "services.membership",
 		"pk": 11,
 		"fields": {
-			"identifier": "facebook-two-B",
+			"identifier": "+120000002",
 			"service_id": 4,
 			"profile_id": 2,
 			"points": 1,
@@ -124,7 +124,7 @@
 		"model": "services.membership",
 		"pk": 12,
 		"fields": {
-			"identifier": "facebook-three-C",
+			"identifier": "+120000003",
 			"service_id": 4,
 			"profile_id": 3,
 			"points": 2,
