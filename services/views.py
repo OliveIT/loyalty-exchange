@@ -10,6 +10,13 @@ from services.serializers import ServiceSerializer, UserSerializer, CurrencyRate
 
 import json
 import requests
+from rest_framework import viewsets, mixins
+
+class NoPostRemoveViewSet(mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    mixins.UpdateModelMixin,
+                    viewsets.GenericViewSet):
+    pass
 
 class ServiceViewSet(viewsets.ModelViewSet):
     """
@@ -35,14 +42,14 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # serializer.save(owner=self.request.user)
         serializer.save()
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(NoPostRemoveViewSet):
     """
     This viewset automatically provides `list` and `detail` actions.
     """
     queryset = MyUser.objects.all()
     serializer_class = UserSerializer
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     """ 
     This viewset automatically provides `list` and `detail` actions.
     """

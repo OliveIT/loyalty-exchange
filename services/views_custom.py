@@ -450,7 +450,7 @@ class TransferPoints(APIView):
             else:
                 error_msg['details'] = "Sender or Receiver not found!"
         else:
-            error_msg['details'] = "sender, receiver's ID, amount > 1 fields are required!"
+            error_msg['details'] = "Sender, Receiver's ID, Amount >= 1 fields are required!"
 
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 

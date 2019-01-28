@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta():
         model = MyUser
-        fields = ('pk', 'email', 'phone', 'first_name', 'last_name')
+        fields = ('id', 'email', 'phone', 'first_name', 'last_name')
         # fields = UserDetailsSerializer.Meta.fields + ('phone', ) #, 'company_name', 'birth')
         read_only_fields = ('email', 'phone',)
 
@@ -143,7 +143,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         # fields = '__all__'
-        fields = ('identifier', 'points', 'rate', 'profile', 'service' ) 
+        fields = ('id', 'identifier', 'points', 'rate', 'profile', 'service' ) 
         read_only_fields = ('points', 'rate',)
 
 
