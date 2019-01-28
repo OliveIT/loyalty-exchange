@@ -109,16 +109,20 @@ def update_everyone(eth=False):
 
         for membership in memberships:
             # check if this guy is included in the response
-            # isFound = False
+            isFound = False
             for res in response:
                 if res['customerIdentifier'] == membership.identifier:
                 # if res['customerIdentifier'] == membership.identifier:
-                    # isFound = True
+                    isFound = True
                     membership.points = res['points']
                     membership.rate = res['rate']
                     membership.save()
                     # TODO Update Ethereum balance here
                     break
+            if not isFound:
+                membership.points = 0
+                membership.save()
+
 
 
 def call_service_get_api(service):
@@ -284,11 +288,11 @@ class RedeemPoints(APIView):
                 error_msg['details'] = "User not found!"
                 break
 
-            customer_status = recalc_a_customer(pk=user_id)
-            amount = Decimal(amount)
-
             # fetch Service API
             update_everyone()
+
+            customer_status = recalc_a_customer(pk=user_id)
+            amount = Decimal(amount)
 
             if mandatory == True:
                 if service_id == None:
