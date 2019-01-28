@@ -50,7 +50,7 @@ from services.helpers.web3helper import web3helper
 #     self.w3.eth.waitForTransactionReceipt(tx_hash)
 #     pass
 
-def update_a_customer(pk, eth=False):
+def recalc_a_customer(pk, eth=False):
     # FIXME when we use hyperlinkedserializer
     # factory = APIRequestFactory()
     # request = factory.get('/')
@@ -85,14 +85,41 @@ def update_a_customer(pk, eth=False):
     return profile_data
 
 
-def update_everyone(eth=False):
+def recalc_everyone(eth=False):
     res = []
     for profile in UserProfile.objects.all():
         if not profile.user.is_superuser:
-            res.append(update_a_customer(pk = profile.pk, eth=eth))
+            res.append(recalc_a_customer(pk = profile.pk, eth=eth))
 
     # content = JSONRenderer().render(res)
     return res
+
+def update_everyone(eth=False):
+    services = Service.objects.all()
+    for service in services: # all services
+
+        response, status_message = call_service_get_api(service)
+        if status_message != 'ok':
+            print(service.title + "'s API is not working.")
+            print(status_message)
+            continue
+
+        # members of current service
+        memberships = Membership.objects.filter(service=service.pk)
+
+        for membership in memberships:
+            # check if this guy is included in the response
+            # isFound = False
+            for res in response:
+                if res['customerIdentifier'] == membership.identifier:
+                # if res['customerIdentifier'] == membership.identifier:
+                    # isFound = True
+                    membership.points = res['points']
+                    membership.rate = res['rate']
+                    membership.save()
+                    # TODO Update Ethereum balance here
+                    break
+
 
 def call_service_get_api(service):
     # res = requests.get('http://199.192.26.112/API/listmerchantcustomer/',data={ "merchID": 10 })
@@ -160,53 +187,8 @@ class GetPoints(APIView):
     #     return Response(serializer.data)
 
     def get(self, request, format=None):
-        # for services
-        #     data fetch from service
-        #     for service.members
-        #         
-        # web3helper = Web3Helper()
-        # web3helper.mint_token("")
-        
-        services = Service.objects.all()
-        for service in services: # all services
-
-            response, status_message = call_service_get_api(service)
-            if status_message != 'ok':
-                print(service.title + "'s API is not working.")
-                print(status_message)
-                continue
-
-            # members of current service
-            memberships = Membership.objects.filter(service=service.pk)
-
-            for membership in memberships:
-                # check if this guy is included in the response
-                # isFound = False
-                for res in response:
-                    if res['customerIdentifier'] == membership.identifier:
-                    # if res['customerIdentifier'] == membership.identifier:
-                        # isFound = True
-                        membership.points = res['points']
-                        membership.rate = res['rate']
-                        membership.save()
-                        # TODO Update Ethereum balance here
-                        break
-                
-                # if isFound == True:
-                #     break
-                # member = membership.profile
-                # print(membership.identifier)
-            
-
-            # print(service.pk)
-            # print( Membership.objects.filter(service__pk = 3) )
-
-        return Response(update_everyone(eth=False), status=status.HTTP_200_OK)
-
-        # serializer = MembershipSerializer(data=request.data)
-        # if serializer.is_valid():
-        #     return Response(request.data, status=status.HTTP_201_CREATED)
-            # serializer.save()
+        update_everyone()
+        return Response(recalc_everyone(eth=False), status=status.HTTP_200_OK)
 
 
 def sort_func(e):
@@ -300,10 +282,13 @@ class RedeemPoints(APIView):
 
             if not profile:
                 error_msg['details'] = "User not found!"
-                break;
+                break
 
-            customer_status = update_a_customer(pk=user_id)
+            customer_status = recalc_a_customer(pk=user_id)
             amount = Decimal(amount)
+
+            # fetch Service API
+            update_everyone()
 
             if mandatory == True:
                 if service_id == None:
@@ -337,7 +322,7 @@ class RedeemPoints(APIView):
                 tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=service)
                 tx.save()
 
-                updated_customer_status = update_a_customer(pk=user_id)
+                updated_customer_status = recalc_a_customer(pk=user_id)
 
                 return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
 
@@ -373,7 +358,7 @@ class RedeemPoints(APIView):
                 tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=None)
                 tx.save()
 
-                updated_customer_status = update_a_customer(pk=user_id)
+                updated_customer_status = recalc_a_customer(pk=user_id)
 
                 return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
             break
@@ -437,8 +422,10 @@ class TransferPoints(APIView):
             receiver = UserProfile.objects.get(user__phone=receiver_phone)
             # user first() method to get model object from array
             if receiver and sender:
-                
-                sender_status = update_a_customer(pk=sender_id)
+                # fetch Service API
+                update_everyone()
+
+                sender_status = recalc_a_customer(pk=sender_id)
                 amount = Decimal(amount)
 
                 if sender_status['total'] >= amount:
@@ -495,7 +482,10 @@ class ConfirmTransferPoints(APIView):
             # user first() method to get model object from array
             amount = transfer_tx.amount
 
-            sender_status = update_a_customer(pk=transfer_tx.sender)
+            # fetch Service API
+            update_everyone()
+
+            sender_status = recalc_a_customer(pk=transfer_tx.sender)
 
             if sender_status['total'] < amount:
                 error_msg['details'] = "Not enough points!"
@@ -520,7 +510,7 @@ class ConfirmTransferPoints(APIView):
             receiver.extra_points += amount
             receiver.save()
 
-            sender_status = update_a_customer(pk=transfer_tx.sender)
+            sender_status = recalc_a_customer(pk=transfer_tx.sender)
             return Response(sender_status, status=status.HTTP_200_OK)
         # end-while
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
@@ -544,7 +534,7 @@ class TotalPoints(APIView):
         if user_id is not None:
             try:
                 MyUser.objects.get(pk=user_id)
-                return Response(update_a_customer(pk=user_id), status=status.HTTP_200_OK)
+                return Response(recalc_a_customer(pk=user_id), status=status.HTTP_200_OK)
             except:
                 return Response({"details": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
-        return Response(update_everyone(), status=status.HTTP_200_OK)
+        return Response(recalc_everyone(), status=status.HTTP_200_OK)
