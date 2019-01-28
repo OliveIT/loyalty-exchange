@@ -35,7 +35,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # serializer.save(owner=self.request.user)
         serializer.save()
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     This viewset automatically provides `list` and `detail` actions.
     """
