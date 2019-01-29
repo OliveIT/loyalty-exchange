@@ -140,10 +140,11 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
 
 class MembershipSerializer(serializers.ModelSerializer):
     # service = ServiceSerializer()   # to inlude details of service
+    service_title = serializers.ReadOnlyField(source='service.title')
     class Meta:
         model = Membership
         # fields = '__all__'
-        fields = ('id', 'identifier', 'points', 'rate', 'profile', 'service' ) 
+        fields = ('id', 'identifier', 'points', 'rate', 'profile', 'service', 'service_title' ) 
         read_only_fields = ('points', 'rate',)
 
 
