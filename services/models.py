@@ -160,7 +160,7 @@ class Membership(models.Model):
     # points = models.IntegerField(default=0)
     points = models.DecimalField(default=0, max_digits=16, decimal_places=6)
     rate = models.DecimalField(default=0, max_digits=16, decimal_places=6)
-    identifier = models.CharField(max_length=100, blank=True, default='')
+    identifier = models.CharField(max_length=100, blank=False)
     #date_of_joining = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -168,7 +168,7 @@ class Membership(models.Model):
     def __str__(self):
         return self.service.title + ' ' + self.profile.email + ' ' + self.points + ' pts'
     class Meta:
-        unique_together = (('profile', 'service'),)
+        unique_together = (('profile', 'service', 'identifier'),)
 
     def calc_real_points(self):
         return Decimal(self.points) * Decimal(self.rate)

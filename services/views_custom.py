@@ -112,7 +112,6 @@ def update_everyone(eth=False):
             isFound = False
             for res in response:
                 if res['customerIdentifier'] == membership.identifier:
-                # if res['customerIdentifier'] == membership.identifier:
                     isFound = True
                     membership.points = res['points']
                     membership.rate = res['rate']
@@ -218,8 +217,8 @@ def sort_func(e):
                     error_msg['details'] = str(e)
 """
 
-def deduct_from_service(user_id, service_id, amount):
-    membership = Membership.objects.filter(profile=user_id, service=service_id).first()
+def deduct_from_service(membership_id, amount):
+    membership = Membership.objects.get(pk=membership_id)
     real_points = membership.calc_real_points()
 
     if real_points == 0:    # don't waste electricity
@@ -294,6 +293,9 @@ class RedeemPoints(APIView):
             customer_status = recalc_a_customer(pk=user_id)
             amount = Decimal(amount)
 
+            customer_memberships = customer_status['memberships']
+            remaining = amount
+
             if mandatory == True:
                 if service_id == None:
                     error_msg['details'] = "Service field is required!"
@@ -305,30 +307,24 @@ class RedeemPoints(APIView):
                     break
                 
                 service_found = False
+                total_membership_points = 0
+                customer_memberships = []
                 for idx, membership in enumerate(customer_status['memberships']):
-                    if(membership['service'] == service_id):
+                    if membership['service'] == service_id:
                         service_found = True
-                        break
+                        customer_memberships.append(membership)
+                        total_membership_points += membership['real_points']
 
                 if service_found == False:
                     error_msg['details'] = "This customer is not a member of the service!"
                     break
 
-                if membership['real_points'] < amount:
+                if total_membership_points < amount:
                     error_msg['details'] = "Not enough points!"
-                    break
-
-                if deduct_from_service(user_id, service_id, amount) > 0:  # call api failed ?!
-                    error_msg['details'] = "Service API call failed! Check API url!"
                     break
 
                 # store history
                 tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=service)
-                tx.save()
-
-                updated_customer_status = recalc_a_customer(pk=user_id)
-
-                return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
 
             else:
 
@@ -341,7 +337,6 @@ class RedeemPoints(APIView):
                 # 3. deduct from other services with less real points first
                 # 4. store transaction history
                 # membership_for_current_service = Membership.objects.filter(profile=user_id, service=service_id).first()
-                remaining = amount
                 # for idx, membership in enumerate(customer_status['memberships']):
                 #     if(membership['service'] == service_id):
                 #         remaining = deduct_from_service(user_id, service_id, remaining)
@@ -351,21 +346,22 @@ class RedeemPoints(APIView):
 
                 if profile.extra_points > 0:
                     remaining = deduct_from_extra_points(user_id, remaining)
-                
-                if remaining > 0:
-                    customer_status['memberships'].sort(key = sort_func)
-                    for membership in customer_status['memberships']:
-                        remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
-                        if remaining <= 0:
-                            break
+
                 # store history
                 tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=None)
-                tx.save()
 
-                updated_customer_status = recalc_a_customer(pk=user_id)
+            if remaining > 0:
+                customer_memberships.sort(key = sort_func)
+                for membership in customer_memberships:
+                    remaining = deduct_from_service(membership_id=membership['id'], amount=remaining)
+                    if remaining <= 0:
+                        break
 
-                return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
-            break
+            tx.save()
+
+            updated_customer_status = recalc_a_customer(pk=user_id)
+
+            return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
             
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
@@ -507,7 +503,7 @@ class ConfirmTransferPoints(APIView):
             if remaining > 0:
                 sender_status['memberships'].sort(key = sort_func)
                 for membership in sender_status['memberships']:
-                    remaining = deduct_from_service(user_id=membership['profile'], service_id=membership['service'], amount=remaining)
+                    remaining = deduct_from_service(membership_id=membership['id'], amount=remaining)
                     if remaining <= 0:
                         break
             
