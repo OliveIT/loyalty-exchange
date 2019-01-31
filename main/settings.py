@@ -184,15 +184,12 @@ if ENVIRONMENT == 'production':
 REST_SESSION_LOGIN = True
 
 SITE_ID = 1
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# ACCOUNT_EMAIL_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-# ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_EMAIL_REQUIRED = True   ## username based login
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 EMAIL_HOST = 'smtp.gmail.com'
@@ -200,12 +197,6 @@ EMAIL_HOST_USER = os.environ["SENDGRID_USER_NAME"]
 EMAIL_HOST_PASSWORD = os.environ["SENDGRID_PASSWORD"]
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-# ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
-# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-# ACCOUNT_USERNAME_REQUIRED = False
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
 
@@ -230,7 +221,6 @@ ACCOUNT_ADAPTER = 'services.adapters.CustomUserAccountAdapter'
 
 AUTHENTICATION_BACKENDS = (
     'services.backends.CustomAuthBackend',
-    # 'django.contrib.auth.backends.ModelBackend', # we don't need this anymore
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 

@@ -22,8 +22,6 @@ urlpatterns = [
     url(r'^redeempoints', views_custom.RedeemPoints.as_view()),
     url(r'^totalpoints', views_custom.TotalPoints.as_view()),
     url(r'^transferpoints', views_custom.TransferPoints.as_view()),
-    # url(r'^transferpoints/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-    #     views_custom.confirm_transfer, name='confirm_transfer'),
     url(r'^confirm_transferpoints', views_custom.ConfirmTransferPoints.as_view(), name='confirm_transfer'),
 ]
 

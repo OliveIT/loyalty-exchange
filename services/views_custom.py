@@ -32,46 +32,22 @@ from rest_framework.test import APIRequestFactory
 
 from services.helpers.web3helper import web3helper
 
-# from web3.providers.eth_tester import EthereumTesterProvider
-
-
-# w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/b5d9a6731e714ddda0c3ca38f410b3cf"))
-# with open(str( settings.BASE_DIR + '/truffle/build/contracts/LEToken.json'), 'r') as abi_definition:
-#     abi = json.load(abi_definition)['abi']
-# contract_address = "0xA44C1aE4A46193d8373355849D3fFebf68A8143F"
-# contract = w3.eth.contract(address=contract_address, abi=abi)
-# concise_contract = ConciseContract(contract)
-# nonce = w3.eth.getTransactionCount('0x5ce9454909639D2D17A3F753ce7d93fa0b9aB12E')
-# admin_private = "0xaaaaaaaaaaaaaaaaaaaaa"
-
-# def mint_token(address, amount):
-#     # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
-#     tx_hash = concise_contract.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
-#     self.w3.eth.waitForTransactionReceipt(tx_hash)
-#     pass
 
 def recalc_a_customer(pk, eth=False):
-    # FIXME when we use hyperlinkedserializer
-    # factory = APIRequestFactory()
-    # request = factory.get('/')
-
-    # serializer_context = {
-    #     'request': Request(request),
-    # }
-    # serializer = ProfileSerializer(instance = UserProfile.objects.get(pk=pk), context=serializer_context)
     serializer = ProfileSerializer(UserProfile.objects.get(pk=pk))
 
-    # FIXME swallow copy?
+    # swallow copy?
     profile_data = dict(serializer.data)
     total = Decimal(profile_data['extra_points'])
     for membership in profile_data['memberships']:
         membership['real_points'] = Decimal(membership['points']) * Decimal(membership['rate'])
         total += Decimal(membership['real_points'])
     profile_data['total'] = total
-    # TODO remove useless properties
+
+    # remove useless properties
     del profile_data['services']
 
-    # TODO update via web3
+    # update via web3
     if eth == True:
         token_balance = web3helper.get_balance(profile_data['eth_public_key'])
         new_balance = round(total * 10000 )
@@ -93,6 +69,7 @@ def recalc_everyone(eth=False):
 
     # content = JSONRenderer().render(res)
     return res
+
 
 def update_everyone(eth=False):
     services = Service.objects.all()
@@ -116,17 +93,13 @@ def update_everyone(eth=False):
                     membership.points = res['points']
                     membership.rate = res['rate']
                     membership.save()
-                    # TODO Update Ethereum balance here
                     break
             if not isFound:
                 membership.points = 0
                 membership.save()
 
 
-
 def call_service_get_api(service):
-    # res = requests.get('http://199.192.26.112/API/listmerchantcustomer/',data={ "merchID": 10 })
-    # print("service.api_url " + service.api_url)
     status_message = "ok"
     retval = {}
     try:
@@ -184,11 +157,6 @@ class GetPoints(APIView):
     Send request to Service Provider's api url and get point value.
     """
 
-    # def get(self, request, format=None):
-    #     services = Service.objects.all()
-    #     serializer = ServiceSerializer(services, many=True)
-    #     return Response(serializer.data)
-
     def get(self, request, format=None):
         update_everyone()
         return Response(recalc_everyone(eth=False), status=status.HTTP_200_OK)
@@ -196,26 +164,7 @@ class GetPoints(APIView):
 
 def sort_func(e):
     return e['real_points']
-"""
-                try:
-                    # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
-                    res = requests.post('http://localhost:37037/api/service/points/redeem', data=request.data)
-                    if res.status_code == 200 or res.status_code == 201:
-                        # success
-                        retval = res.json()
-                        membership.points = retval['points']
-                        if flag_save_id:
-                            membership.identifier = identifier
-                        membership.save()
-                        retval = serializers.serialize('json', [ membership, ])
-                        return Response(retval, status=status.HTTP_201_CREATED)
-                    # error code
-                    error_msg['details'] = res.json()
-                except (requests.ConnectionError, requests.Timeout, requests.exceptions.HTTPError) as e:
-                    # exception
-                    # TRICK str()
-                    error_msg['details'] = str(e)
-"""
+
 
 def deduct_from_service(membership_id, amount):
     membership = Membership.objects.get(pk=membership_id)
@@ -225,7 +174,7 @@ def deduct_from_service(membership_id, amount):
         return amount # ignore
 
     if real_points >= amount:
-        # deduct   amount / membership.rate from service
+        # deduct amount / membership.rate from service
         if not call_service_deduct_api(membership, amount / membership.rate):
             return amount # ignore
 
@@ -241,6 +190,7 @@ def deduct_from_service(membership_id, amount):
     membership.save()
     return amount - real_points
 
+
 def deduct_from_extra_points(user_id, amount):
     profile = UserProfile.objects.get(pk=user_id)
     extra_points = profile.extra_points
@@ -253,15 +203,11 @@ def deduct_from_extra_points(user_id, amount):
     profile.save()
     return amount - extra_points
 
+
 class RedeemPoints(APIView):
     """
-    Send request to Service Provider's api url and get point value.
+    Deduct points form Service and DB
     """
-
-    # def get(self, request, format=None):
-    #     services = Service.objects.all()
-    #     serializer = ServiceSerializer(services, many=True)
-    #     return Response(serializer.data)
 
     def post(self, request, format=None):
         user_id = request.data.get('user', None)
@@ -348,13 +294,6 @@ class RedeemPoints(APIView):
                 # 2. extra points
                 # 3. deduct from other services with less real points first
                 # 4. store transaction history
-                # membership_for_current_service = Membership.objects.filter(profile=user_id, service=service_id).first()
-                # for idx, membership in enumerate(customer_status['memberships']):
-                #     if(membership['service'] == service_id):
-                #         remaining = deduct_from_service(user_id, service_id, remaining)
-                #         # now remove this membership from snapshot
-                #         del customer_status['memberships'][idx]
-                #         break
 
                 if profile.extra_points > 0:
                     remaining = deduct_from_extra_points(user_id, remaining)
@@ -399,7 +338,6 @@ def create_new_transfer_tx(sender, receiver, amount, current_site="example.com")
         'receiver': receiver,
         'domain': current_site.domain,
         'amount': amount,
-        # 'uid':urlsafe_base64_encode(force_bytes(sender.pk)),
         'token':otp_code,
     })
     email = EmailMessage(
@@ -411,13 +349,8 @@ def create_new_transfer_tx(sender, receiver, amount, current_site="example.com")
 
 class TransferPoints(APIView):
     """
-    Send request to Service Provider's api url and get point value.
+    Send points to other user
     """
-
-    # def get(self, request, format=None):
-    #     services = Service.objects.all()
-    #     serializer = ServiceSerializer(services, many=True)
-    #     return Response(serializer.data)
 
     def post(self, request, format=None):
         sender_id = request.data.get('sender', None)
@@ -463,7 +396,7 @@ class TransferPoints(APIView):
 
 class ConfirmTransferPoints(APIView):
     """
-    Send request to Service Provider's api url and get point value.
+    Confirm transfer points transaction
     """
 
     # def get(self, request, format=None):
@@ -545,14 +478,6 @@ class TotalPoints(APIView):
     """
 
     def get(self, request, format=None):
-        # services = Service.objects.all()
-        # serializer = ServiceSerializer(services, many=True)
-        # return Response(serializer.data)
-
-        # tx1 = web3helper.mint_token("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1", 22222)
-        # tx2 = web3helper.set_token("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1", 12345678)
-        # balance = web3helper.get_balance("0x16ED712EEd73b0128e6380E3eC5e210fBD6e51E1")
-
         user_id = self.request.query_params.get('user', None)
         if user_id is not None:
             try:
