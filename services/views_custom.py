@@ -220,8 +220,13 @@ class RedeemPoints(APIView):
         }
 
         while True:
-            if not (user_id >= 1 and amount >= 1 and mandatory != None):
-                error_msg['details'] = "User, Amount, Mandatory fields are required!"
+            try:
+                user_id = int(user_id)
+                amount = float(amount)
+            except ValueError:
+                error_msg = {
+                    "details": "User and Amount field are not valid!"
+                }
                 break
 
             if amount < 1:
@@ -251,8 +256,12 @@ class RedeemPoints(APIView):
             remaining = amount
 
             if mandatory == True:
-                if not service_id > 1:
-                    error_msg['details'] = "Service field is required!"
+                try:
+                    service_id = int(service_id)
+                except ValueError:
+                    error_msg = {
+                        "details": "Service field is not valid!"
+                    }
                     break
 
                 try:
@@ -301,6 +310,7 @@ class RedeemPoints(APIView):
                 # store history
                 tx = RedeemTransaction(id=None, amount=amount, user=profile.user, service=None)
 
+            # sort memberships in increasing order of points!
             if remaining > 0:
                 customer_memberships.sort(key = sort_func)
                 for membership in customer_memberships:
