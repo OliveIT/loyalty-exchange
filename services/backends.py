@@ -8,16 +8,8 @@ UserModel = get_user_model()
 class CustomAuthBackend(ModelBackend):
     # def authenticate(self, request, phone=None, email=None, password=None, **kwargs):
     def authenticate(self, request, username=None, password=None, **kwargs):
-        print("CustomAuthBackend: authenticate")
-        print(username)
-        print(password)
-        print(kwargs)
         user = None
         try:
-            # if phone:
-            #     user = UserModel.objects.get(phone=phone)
-            # if not user and email:
-            #     user = UserModel.objects.get(email=email)
             user = UserModel.objects.get(phone=username)
         except UserModel.DoesNotExist:
             pass
@@ -25,9 +17,7 @@ class CustomAuthBackend(ModelBackend):
         try:
             user = UserModel.objects.get(email=username)
         except UserModel.DoesNotExist:
-            # UserModel().set_password(password)
             UserModel().set_password(password)
-
             # raise exceptions.AuthenticationFailed('No such user')
 
         if not user:

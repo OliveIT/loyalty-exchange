@@ -274,14 +274,22 @@ class RedeemPoints(APIView):
         }
 
         while True:
-            if user_id == None or amount == None or mandatory == None:
+            if not (user_id >= 1 and amount >= 1 and mandatory != None):
                 error_msg['details'] = "User, Amount, Mandatory fields are required!"
                 break
+
             if amount < 1:
                 error_msg['details'] = "Amount >= 1"
                 break
             
-            profile = UserProfile.objects.get(pk=user_id)
+            if mandatory != False and mandatory != True:
+                error_msg['details'] = "Mandatory field is invalid"
+                break
+            
+            try:
+                profile = UserProfile.objects.get(pk=user_id)
+            except UserProfile.DoesNotExist:
+                profile = None
 
             if not profile:
                 error_msg['details'] = "User not found!"
@@ -297,11 +305,15 @@ class RedeemPoints(APIView):
             remaining = amount
 
             if mandatory == True:
-                if service_id == None:
+                if not service_id > 1:
                     error_msg['details'] = "Service field is required!"
                     break
 
-                service = Service.objects.get(pk=service_id)
+                try:
+                    service = Service.objects.get(pk=service_id)
+                except Service.DoesNotExist:
+                    service = None
+
                 if not service:
                     error_msg['details'] = "Service not found!"
                     break
@@ -418,8 +430,16 @@ class TransferPoints(APIView):
 
         if sender_id and receiver_phone and amount >= 1:
             # Membership.objects.get(pk=1)
-            sender = UserProfile.objects.get(pk=sender_id)
-            receiver = UserProfile.objects.get(user__phone=receiver_phone)
+            try:
+                sender = UserProfile.objects.get(pk=sender_id)
+            except UserProfile.DoesNotExist:
+                sender = None
+
+            try:
+                receiver = UserProfile.objects.get(user__phone=receiver_phone)
+            except UserProfile.DoesNotExist:
+                receiver = None
+
             # user first() method to get model object from array
             if receiver and sender:
                 # fetch Service API
@@ -463,7 +483,10 @@ class ConfirmTransferPoints(APIView):
                 error_msg['details'] = "Confirmation Code is missing!"
                 break
 
-            transfer_tx = TransferTransaction.objects.get(otp_code=otp)
+            try:
+                transfer_tx = TransferTransaction.objects.get(otp_code=otp)
+            except TransferTransaction.DoesNotExist:
+                transfer_tx = None
 
             if not transfer_tx:
                 error_msg['details'] = "Invalid Confirmation Code!"

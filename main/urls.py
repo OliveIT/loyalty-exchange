@@ -5,7 +5,7 @@ from rest_framework.documentation import include_docs_urls
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from rest_framework_swagger.views import get_swagger_view
-from services.forms import RemoteLoginAwareLoginForm
+# from services.forms import RemoteLoginAwareLoginForm
 
 from django.contrib.auth import views
 from django.contrib.auth import views as auth_views

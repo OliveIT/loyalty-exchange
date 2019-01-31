@@ -166,6 +166,7 @@ class CustomRegisterSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     _("A user is already registered with this e-mail address."))
         return email
+
     def validate_password1(self, password):
         return get_adapter().clean_password(password)
 
@@ -188,9 +189,6 @@ class CustomRegisterSerializer(serializers.Serializer):
         return data
 
     def custom_signup(self, request, user):
-        # cleaned = self.get_cleaned_data()
-        # user.phone = cleaned['phone']
-        # user.save()
         pass
 
     def get_cleaned_data(self):
