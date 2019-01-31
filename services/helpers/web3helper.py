@@ -42,7 +42,7 @@ class Web3Helper:
             mintTx = self.contract.functions.control(address, amount).buildTransaction({
                 'chainId': 3,
                 'gas': 100000,
-                'gasPrice': self.w3.toWei('500', 'gwei'),
+                'gasPrice': self.w3.toWei('10', 'gwei'),
                 'nonce': nonce,
             })
             signed_txn = self.w3.eth.account.signTransaction(mintTx, private_key=self.admin_account.privateKey)

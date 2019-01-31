@@ -19,6 +19,7 @@ router.register(r'redeem_transactions', views.RedeemTransactionViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^getpoints', views_custom.GetPoints.as_view()),
+    url(r'^synctokens', views_custom.SyncTokens.as_view()),
     url(r'^redeempoints', views_custom.RedeemPoints.as_view()),
     url(r'^totalpoints', views_custom.TotalPoints.as_view()),
     url(r'^transferpoints', views_custom.TransferPoints.as_view()),

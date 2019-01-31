@@ -161,6 +161,15 @@ class GetPoints(APIView):
         update_everyone()
         return Response(recalc_everyone(eth=False), status=status.HTTP_200_OK)
 
+class SyncTokens(APIView):
+    """
+    Send request to Service Provider's api url and get point value.
+    """
+
+    def get(self, request, format=None):
+        update_everyone()
+        return Response(recalc_everyone(eth=True), status=status.HTTP_200_OK)
+
 
 def sort_func(e):
     return e['real_points']
