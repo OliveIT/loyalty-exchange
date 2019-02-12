@@ -53,10 +53,10 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
 class MembershipViewSet(viewsets.ModelViewSet):
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
-    permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,
-        # IsAdminOrReadOnly,
-    )
+    # permission_classes = (
+    #     permissions.IsAuthenticatedOrReadOnly,
+    #     # IsAdminOrReadOnly,
+    # )
 
     def get_queryset(self):
         queryset = Membership.objects.all()
