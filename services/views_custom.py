@@ -34,9 +34,9 @@ from services.helpers.web3helper import web3helper
 
 
 def recalc_a_customer(pk, eth=False):
-"""
-Calculate total points of a customer
-"""
+    """
+    Calculate total points of a customer
+    """
     serializer = ProfileSerializer(UserProfile.objects.get(pk=pk))
 
     # swallow copy?
@@ -66,9 +66,9 @@ Calculate total points of a customer
 
 
 def recalc_everyone(eth=False):
-"""
-Calculate total points of all customers
-"""
+    """
+    Calculate total points of all customers
+    """
     res = []
     for profile in UserProfile.objects.all():
         if not profile.user.is_superuser:
@@ -79,9 +79,9 @@ Calculate total points of all customers
 
 
 def update_everyone(eth=False):
-"""
-Fetch latest data from all services and update all users
-"""
+    """
+    Fetch latest data from all services and update all users
+    """
     services = Service.objects.all()
     for service in services: # all services
 
@@ -110,9 +110,9 @@ Fetch latest data from all services and update all users
 
 
 def call_service_get_api(service):
-"""
-Call Get api of Service API
-"""
+    """
+    Call Get api of Service API
+    """
     status_message = "ok"
     retval = {}
     try:
@@ -137,9 +137,9 @@ Call Get api of Service API
 
 
 def call_service_deduct_api(membership, deduct_amount):
-"""
-Call Reduct api of Service API
-"""
+    """
+    Call Reduct api of Service API
+    """
     status_message = "ok"
     try:
         # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
