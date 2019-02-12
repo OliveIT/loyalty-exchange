@@ -32,7 +32,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         if title is not None:
             queryset = queryset.filter(title__startswith=title)
         return queryset
-    
+
     # @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
     # def highlight(self, request, *args, **kwargs):
     #     service = self.get_object()
@@ -43,16 +43,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 class UserViewSet(NoPostRemoveViewSet):
-    """
-    This viewset automatically provides `list` and `detail` actions.
-    """
     queryset = MyUser.objects.all()
     serializer_class = UserSerializer
 
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
-    """ 
-    This viewset automatically provides `list` and `detail` actions.
-    """
     queryset = UserProfile.objects.all()
     serializer_class = ProfileSerializer
 
@@ -78,9 +72,6 @@ class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
     """
     This viewset gives up-to-date currency rates
     """
-    # queryset = User.objects.all()
-    # serializer_class = UserSerializer
-
     queryset = CurrencyRate.objects.all()
     serializer_class = CurrencyRateSerializer
 

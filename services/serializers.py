@@ -7,10 +7,6 @@ from rest_auth.serializers import UserDetailsSerializer
 
 class UserSerializer(serializers.ModelSerializer):
 
-    # company_name = serializers.CharField(source="profile.company_name")
-    # phone = serializers.CharField()
-    # birth = serializers.CharField(source="profile.birth")
-
     class Meta():
         model = MyUser
         fields = ('id', 'email', 'phone', 'first_name', 'last_name')
@@ -33,7 +29,7 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    # service = ServiceSerializer()   # to inlude details of service
+    # service = ServiceSerializer()   # to include details of service
     service_title = serializers.ReadOnlyField(source='service.title')
     class Meta:
         model = Membership
@@ -52,7 +48,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('user_id', 'email', 'phone', 'eth_public_key', 'extra_points','memberships', 'services')
-        # 'company_name',  'wallet', 'is_active',
         read_only_fields = ('eth_public_key', 'phone', )
         depth = 1
 
@@ -60,7 +55,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class RedeemTransactionSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source='user.phone')
     # service = serializers.CharField(source='service.title')
-    service = serializers.SerializerMethodField('get_servicetitle')
+    service = serializers.SerializerMethodField('get_servicetitle') # method field!!!
 
     amount = serializers.DecimalField(max_digits=16, decimal_places=6, read_only=True)
     created_at = serializers.DateTimeField()
