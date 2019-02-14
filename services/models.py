@@ -117,11 +117,8 @@ class UserProfile(models.Model):
     )
 
     # additional fields for user
-    company_name = models.CharField(max_length=100, blank=True, default='')
-    is_active = models.BooleanField(default=True)
     # created_at = models.DateTimeField(auto_now_add=True)
     # updated_at = models.DateTimeField(auto_now_add=True)
-    #####
 
     def __str__(self):
         return self.user.email;
@@ -179,7 +176,6 @@ class RedeemTransaction(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE)
     amount = models.DecimalField(default=0, max_digits=16, decimal_places=6)
-    tx_hash = models.CharField(max_length=100, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
 class TransferTransaction(models.Model):
@@ -199,7 +195,4 @@ class TransferTransaction(models.Model):
     # unique string for each confirm link
     otp_code = models.CharField(max_length=100, blank=False)
     status = models.CharField(max_length=100, blank=False, default='Unconfirmed')
-    # not used
-    burn_tx_hash = models.CharField(max_length=100, blank=True, default='')
-    mint_tx_hash = models.CharField(max_length=100, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
