@@ -47,8 +47,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     # phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     # phone = models.CharField(validators=[phone_regex], max_length=17, unique=True, null=True) # validators should be a list
     phone = PhoneNumberField(null=False, blank=False, unique=True)
-    first_name = models.EmailField(max_length=100, blank=True, default='')
-    last_name = models.EmailField(max_length=100, blank=True, default='')
+    first_name = models.CharField(max_length=20, blank=True, default='')
+    last_name = models.CharField(max_length=20, blank=True, default='')
     date_joined = models.DateTimeField(auto_now_add=True)
 
     is_staff = models.BooleanField(
