@@ -3,7 +3,6 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-# from rest_auth.registration.serializers import RegisterSerializer
 from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -103,47 +102,6 @@ class LoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
-
-"""
-class CustomRegisterSerializer(RegisterSerializer):
-    # first_name = serializers.CharField(required = True, write_only=True)
-    # last_name = serializers.CharField(required = True, write_only=True)
-    # birth = serializers.CharField(required = True, write_only=True)
-
-    # company_name = serializers.CharField(required = True, write_only=True)
-    # phone = serializers.CharField(required = True, write_only=True)
-
-    # class Meta(RegisterSerializer.Meta):
-    #     fields = RegisterSerializer.Meta.fields + ('company_name','phone')
-
-    # def custom_signup(self, request, user):
-    #     profile = user.profile
-    #     profile.company_name = "asdf"
-    #     profile.phone = '2435-4325'
-    #     profile.save()
-
-    def get_cleaned_data(self):
-        super(CustomRegisterSerializer, self).get_cleaned_data()
-        return {
-            # 'username': self.validated_data.get('username', ''),
-            'email': self.validated_data.get('email', ''),
-            'phone': self.validated_data.get('phone', ''),
-            'password1': self.validated_data.get('password1', ''),
-            # 'first_name': self.validated_data.get('first_name', ''),
-            # 'last_name': self.validated_data.get('last_name', ''),
-            # 'company_name': self.validated_data.get('company_name', ''),
-            # 'birth': self.validated_data.get('birth', ''),
-        }
-
-    def custom_signup(self, request, user):
-        cleaned = self.get_cleaned_data()
-        # profile = user.profile
-        # profile.company_name = cleaned['company_name']
-        # profile.phone = cleaned['phone']
-        # profile.birth = cleaned['birth']
-        # profile.save()
-        pass
-"""
 
 class CustomRegisterSerializer(serializers.Serializer):
     # phone = serializers.CharField(

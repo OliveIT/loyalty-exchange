@@ -38,7 +38,7 @@ class CustomAuthBackend(ModelBackend):
         email_address = user.emailaddress_set.get(email=user.email)
         if not email_address.verified:
             # raise exceptions.AuthenticationFailed('Email Not Verified')
-            # raise exceptions.ValidationError("###### Email Not Verified")
+            # raise exceptions.ValidationError(" Email Not Verified")
             return None
 
         return True

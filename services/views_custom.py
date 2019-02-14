@@ -34,6 +34,9 @@ from services.helpers.web3helper import web3helper
 
 
 def recalc_a_customer(pk, eth=False):
+    """
+    Calculate total points of a customer
+    """
     serializer = ProfileSerializer(UserProfile.objects.get(pk=pk))
 
     # swallow copy?
@@ -50,6 +53,7 @@ def recalc_a_customer(pk, eth=False):
     # update via web3
     if eth == True:
         token_balance = web3helper.get_balance(profile_data['eth_public_key'])
+        # make integer
         new_balance = round(total * 10000 )
 
         if abs(token_balance - new_balance) >= 1:    #ignore small difference
@@ -62,6 +66,9 @@ def recalc_a_customer(pk, eth=False):
 
 
 def recalc_everyone(eth=False):
+    """
+    Calculate total points of all customers
+    """
     res = []
     for profile in UserProfile.objects.all():
         if not profile.user.is_superuser:
@@ -72,6 +79,9 @@ def recalc_everyone(eth=False):
 
 
 def update_everyone(eth=False):
+    """
+    Fetch latest data from all services and update all users
+    """
     services = Service.objects.all()
     for service in services: # all services
 
@@ -100,6 +110,9 @@ def update_everyone(eth=False):
 
 
 def call_service_get_api(service):
+    """
+    Call Get api of Service API
+    """
     status_message = "ok"
     retval = {}
     try:
@@ -124,6 +137,9 @@ def call_service_get_api(service):
 
 
 def call_service_deduct_api(membership, deduct_amount):
+    """
+    Call Reduct api of Service API
+    """
     status_message = "ok"
     try:
         # https://stackoverflow.com/questions/9733638/post-json-using-python-requests
@@ -164,6 +180,7 @@ class GetPoints(APIView):
 class SyncTokens(APIView):
     """
     Send request to Service Provider's api url and get point value.
+    And also update Ethereum token balance.
     """
 
     def get(self, request, format=None):
@@ -215,7 +232,7 @@ def deduct_from_extra_points(user_id, amount):
 
 class RedeemPoints(APIView):
     """
-    Deduct points form Service and DB
+    Deduct points form Service API and DB
     """
 
     def post(self, request, format=None):
@@ -264,6 +281,11 @@ class RedeemPoints(APIView):
             customer_memberships = customer_status['memberships']
             remaining = amount
 
+            # 1. point of this service (in case of mandatory flag is true)
+            # 2. extra points
+            # 3. deduct from other services with less points first
+            # 4. store transaction history
+
             if mandatory == True:
                 try:
                     service_id = int(service_id)
@@ -308,11 +330,6 @@ class RedeemPoints(APIView):
                     error_msg['details'] = "Not enough points!"
                     break
                 
-                # 1. point of this service
-                # 2. extra points
-                # 3. deduct from other services with less real points first
-                # 4. store transaction history
-
                 if profile.extra_points > 0:
                     remaining = deduct_from_extra_points(user_id, remaining)
 
@@ -334,7 +351,6 @@ class RedeemPoints(APIView):
             return Response({ 'result': 'ok', 'update': updated_customer_status}, status=status.HTTP_200_OK)
             
         return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 def create_new_transfer_tx(sender, receiver, amount, current_site="example.com"):
@@ -381,7 +397,6 @@ class TransferPoints(APIView):
         }
 
         if sender_id and receiver_phone and amount >= 1:
-            # Membership.objects.get(pk=1)
             try:
                 sender = UserProfile.objects.get(pk=sender_id)
             except UserProfile.DoesNotExist:
@@ -392,9 +407,8 @@ class TransferPoints(APIView):
             except UserProfile.DoesNotExist:
                 receiver = None
 
-            # user first() method to get model object from array
             if receiver and sender:
-                # fetch Service API
+                # refresh with service data
                 update_everyone()
 
                 sender_status = recalc_a_customer(pk=sender_id)
@@ -417,11 +431,6 @@ class ConfirmTransferPoints(APIView):
     """
     Confirm transfer points transaction
     """
-
-    # def get(self, request, format=None):
-    #     services = Service.objects.all()
-    #     serializer = ServiceSerializer(services, many=True)
-    #     return Response(serializer.data)
 
     def post(self, request, format=None):
         otp = request.data.get('otp', None)
