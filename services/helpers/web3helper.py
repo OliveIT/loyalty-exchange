@@ -10,7 +10,7 @@ class Web3Helper:
         self.w3 = Web3(Web3.HTTPProvider("https://ropsten.infura.io/v3/" + os.getenv('ADMIN_INFURA_API', '')))
         with open(str( settings.BASE_DIR + '/truffle/build/contracts/LoyaltyExchangeToken.json'), 'r') as abi_definition:
             self.abi = json.load(abi_definition)['abi']
-        self.contract_address = "0x229C016C59879d2E9E752BF0B026b88C2Ad342F0"
+        self.contract_address = os.getenv('CONTRACT_ADDRESS', '')
         self.contract = self.w3.eth.contract(
             address=self.contract_address,
             abi=self.abi)
@@ -53,10 +53,3 @@ class Web3Helper:
             return False
 
 web3helper = Web3Helper()
-
-
-    # def mint_token(self, address, amount):
-    #     # tx_hash = self.contract.functions.mint(address, amount).transact({'from': self.w3.eth.accounts[0], 'gas': 1000000, })
-    #     tx_hash = self.concise.mint(address, amount, transact={'from': self.w3.eth.accounts[1], 'gas': 100000})
-    #     self.w3.eth.waitForTransactionReceipt(tx_hash)
-    #     pass

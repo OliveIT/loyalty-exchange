@@ -54,10 +54,10 @@ def recalc_a_customer(pk, eth=False):
     if eth == True:
         token_balance = web3helper.get_balance(profile_data['eth_public_key'])
         # make integer
-        new_balance = round(total * 10000 )
+        new_balance = round(total * 1000000 )
 
         if abs(token_balance - new_balance) >= 1:    #ignore small difference
-            print('Address: ' + profile_data['eth_public_key'] + 'Original : ' + str(token_balance) + ', New : ' + str(new_balance) + ', User: ' + str(profile_data['phone']) )
+            print('Address: ' + profile_data['eth_public_key'] + ' Original : ' + str(token_balance) + ', New : ' + str(new_balance) + ', User: ' + str(profile_data['phone']) )
             web3helper.set_token(profile_data['eth_public_key'], new_balance)
 
         pass
