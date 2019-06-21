@@ -4,6 +4,7 @@ from django.conf import settings
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
+import phonenumber_field.modelfields
 
 
 class Migration(migrations.Migration):
@@ -23,48 +24,15 @@ class Migration(migrations.Migration):
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
                 ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
                 ('email', models.EmailField(max_length=254, null=True, unique=True)),
-                ('phone', models.CharField(max_length=17, null=True, unique=True, validators=[django.core.validators.RegexValidator(message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.", regex='^\\+?1?\\d{9,15}$')])),
+                ('phone', phonenumber_field.modelfields.PhoneNumberField(default='000-0000', max_length=128, unique=True)),
+                ('first_name', models.EmailField(blank=True, default='', max_length=100)),
+                ('last_name', models.EmailField(blank=True, default='', max_length=100)),
                 ('is_staff', models.BooleanField(default=False, help_text='Is the user allowed to have access to the admin', verbose_name='staff status')),
                 ('is_active', models.BooleanField(default=True, help_text='Is the user account currently active', verbose_name='active')),
+                ('date_joined', models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now)),
             ],
             options={
                 'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='CurrencyRate',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('currency', models.CharField(default='USD', max_length=100)),
-                ('rate', models.CharField(default='1', max_length=100)),
-                ('updated_ts', models.DateTimeField(auto_now_add=True)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Membership',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('points', models.IntegerField(default=0)),
-                ('identifier', models.CharField(blank=True, default='', max_length=100)),
-                ('install_ts', models.DateTimeField(auto_now_add=True)),
-                ('update_ts', models.DateTimeField(auto_now_add=True)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Service',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(default='', max_length=100)),
-                ('description', models.TextField()),
-                ('service_type', models.CharField(choices=[('airline', 'airline'), ('gym', 'gym'), ('mart', 'mart'), ('spa', 'spa'), ('taxi', 'taxi')], default='airline', max_length=100)),
-                ('country', models.CharField(choices=[('CA', 'CA'), ('DE', 'DE'), ('FR', 'FR'), ('UK', 'UK'), ('US', 'US')], default='US', max_length=100)),
-                ('is_opened', models.BooleanField(default=True)),
-                ('contact', models.TextField()),
-                ('api_url', models.CharField(default='', max_length=300)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'ordering': ('created',),
             },
         ),
         migrations.CreateModel(
@@ -79,11 +47,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AddField(
-            model_name='membership',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='services.Service'),
-        ),
-        migrations.AddField(
             model_name='myuser',
             name='groups',
             field=models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups'),
@@ -92,15 +55,5 @@ class Migration(migrations.Migration):
             model_name='myuser',
             name='user_permissions',
             field=models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions'),
-        ),
-        migrations.AddField(
-            model_name='userprofile',
-            name='services',
-            field=models.ManyToManyField(through='services.Membership', to='services.Service'),
-        ),
-        migrations.AddField(
-            model_name='membership',
-            name='profile',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='membership', to='services.UserProfile'),
         ),
     ]
