@@ -30,9 +30,6 @@ from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
-from services.helpers.web3helper import web3helper
-
-
 def recalc_a_customer(pk, eth=False):
     """
     Calculate total points of a customer
@@ -49,18 +46,6 @@ def recalc_a_customer(pk, eth=False):
 
     # remove useless properties
     del profile_data['services']
-
-    # update via web3
-    if eth == True:
-        token_balance = web3helper.get_balance(profile_data['eth_public_key'])
-        # make integer
-        new_balance = round(total * 1000000 )
-
-        if abs(token_balance - new_balance) >= 1:    #ignore small difference
-            print('Address: ' + profile_data['eth_public_key'] + ' Original : ' + str(token_balance) + ', New : ' + str(new_balance) + ', User: ' + str(profile_data['phone']) )
-            web3helper.set_token(profile_data['eth_public_key'], new_balance)
-
-        pass
 
     return profile_data
 

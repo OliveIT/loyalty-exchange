@@ -16,7 +16,5 @@ django-allauth>=0.24.1
 six==1.9.0
 django-rest-swagger==2.0.7
 
-web3
-
 django-phonenumber-field
 phonenumbers
