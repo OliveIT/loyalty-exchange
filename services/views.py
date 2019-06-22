@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from services.models import Service, MyUser, UserProfile
+from services.models import MyUser, UserProfile
 from services.permissions import IsAdminOrReadOnly
 from services.serializers import UserSerializer, ProfileSerializer
 

@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 from django.db import IntegrityError, transaction
-from services.models import Service, MyUser, UserProfile
+from services.models import MyUser, UserProfile
 from rest_auth.serializers import UserDetailsSerializer
 
 class UserSerializer(serializers.ModelSerializer):

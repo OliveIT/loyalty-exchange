@@ -37,8 +37,8 @@ urlpatterns = [
 # auth
     url(r'^auth/', include('rest_auth.urls')),
     url(r'^auth/registration/', include('rest_auth.registration.urls')),
-    url(r'^account/', include('allauth.urls')),
-    url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
+    # url(r'^account/', include('allauth.urls')),
+    # url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
 
     url(r'^admin/', admin.site.urls),
 ]

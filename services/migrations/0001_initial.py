@@ -40,10 +40,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='profile', serialize=False, to=settings.AUTH_USER_MODEL)),
                 ('wallet', models.CharField(max_length=100, null=True)),
-                ('company_name', models.CharField(blank=True, max_length=100)),
-                ('phone', models.CharField(max_length=100, null=True, unique=True)),
-                ('birth', models.CharField(blank=True, max_length=100)),
-                ('is_active', models.BooleanField(default=True)),
+                ('company_name', models.CharField(null=True, max_length=100)),
+                ('extra_data', models.DecimalField(null=True,default=0, max_digits=16, decimal_places=6)),
+                ('is_active', models.BooleanField(null=True,default=True)),
             ],
         ),
         migrations.AddField(
