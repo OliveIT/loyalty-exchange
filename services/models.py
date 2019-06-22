@@ -13,6 +13,8 @@ class MyUserManager(BaseUserManager):
     A custom user manager to deal with emails as unique identifiers for auth
     instead of usernames. The default that's used is "UserManager"
     """
+    use_in_migrations = True
+
     def _create_user(self, email, password, **extra_fields):
         """
         Creates and saves a User with the given email and password.
@@ -24,6 +26,12 @@ class MyUserManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
+    
+    def create_user(self, email, password=None, **extra_fields):
+        """Create and save a regular User with the given email and password."""
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -37,8 +45,8 @@ class MyUserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True, null=True)
-    phone = PhoneNumberField(null=False, blank=False, unique=True)
+    email = models.EmailField(unique=True, null=False)
+    phone = PhoneNumberField(blank=True, null=True, default='')
     first_name = models.CharField(max_length=20, blank=True, default='')
     last_name = models.CharField(max_length=20, blank=True, default='')
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -53,7 +61,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         default=True,
         help_text= 'Is the user account currently active',
     )
-    USERNAME_FIELD = 'phone'
+    username = None
+    USERNAME_FIELD = 'email'
     objects = MyUserManager()
  
     def __str__(self):

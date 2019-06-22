@@ -21,15 +21,16 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
                 ('email', models.EmailField(max_length=254, null=True, unique=True)),
-                ('phone', phonenumber_field.modelfields.PhoneNumberField(default='000-0000', max_length=128, unique=True)),
-                ('first_name', models.EmailField(blank=True, default='', max_length=100)),
-                ('last_name', models.EmailField(blank=True, default='', max_length=100)),
+                ('phone', phonenumber_field.modelfields.PhoneNumberField(null=True, blank=True)),
+                ('first_name', models.CharField(blank=True, default='', max_length=100)),
+                ('last_name', models.CharField(blank=True, default='', max_length=100)),
+
+                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
                 ('is_staff', models.BooleanField(default=False, help_text='Is the user allowed to have access to the admin', verbose_name='staff status')),
                 ('is_active', models.BooleanField(default=True, help_text='Is the user account currently active', verbose_name='active')),
                 ('date_joined', models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now)),
+                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
             ],
             options={
                 'abstract': False,

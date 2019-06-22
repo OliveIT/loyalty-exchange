@@ -109,7 +109,7 @@ class CustomRegisterSerializer(serializers.Serializer):
     #     min_length=allauth_settings.USERNAME_MIN_LENGTH,
     #     required=allauth_settings.USERNAME_REQUIRED
     # )
-    phone = serializers.CharField(required=True)
+    phone = serializers.CharField(required=False)
     email = serializers.EmailField(required=True)
     # email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     password1 = serializers.CharField(write_only=True)
@@ -136,14 +136,16 @@ class CustomRegisterSerializer(serializers.Serializer):
         try:
             correct_format = phonenumbers.parse(data['phone'], None)
         except phonenumbers.NumberParseException as e:
-            raise serializers.ValidationError(_(str(e)))
+            raise serializers.ValidationError(_(str(e))) # wrong format
+        except KeyError:
+            pass # doesn't exist
 
         # see if existing phone
-        users = get_user_model().objects
-        ret = users.filter(**{'phone' + '__iexact': data['phone']}).exists()
-        if ret:
-            raise serializers.ValidationError(
-                    _("A user is already registered with this phone number."))
+        # users = get_user_model().objects
+        # ret = users.filter(**{'phone' + '__iexact': data['phone']}).exists()
+        # if ret:
+        #     raise serializers.ValidationError(
+        #             _("A user is already registered with this phone number."))
         return data
 
     def custom_signup(self, request, user):

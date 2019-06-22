@@ -1,5 +1,6 @@
-djangorestframework
 Django
+djangorestframework
+mysqlclient
 Pygments
 Markdown
 coreapi
@@ -8,7 +9,6 @@ gunicorn
 whitenoise
 
 django-rest-registration
-mysqlclient
 
 django-rest-auth
 django-allauth

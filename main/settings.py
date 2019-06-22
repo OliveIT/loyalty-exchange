@@ -106,7 +106,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'hoho',
         'USER': 'root',
-        'PASSWORD': 'secure password 12345',
+        'PASSWORD': 'secure',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
