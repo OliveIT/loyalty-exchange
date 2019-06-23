@@ -158,15 +158,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Django REST Framework
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
-    'DEFAULT_PAGINATION_CLASS':
-    'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 
     ## TODO newly added
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    # ]
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
 }
 
 if ENVIRONMENT == 'production':
@@ -181,7 +180,7 @@ if ENVIRONMENT == 'production':
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-REST_SESSION_LOGIN = True
+REST_SESSION_LOGIN = False
 
 SITE_ID = 1
 
@@ -206,10 +205,10 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 # must enter old password to change password
 OLD_PASSWORD_FIELD_ENABLED = True
 
-SWAGGER_SETTINGS = {
-    'LOGIN_URL': '/rest-urls/login',
-    'LOGOUT_URL': '/rest-urls/logout',
-}
+# SWAGGER_SETTINGS = {
+#     'LOGIN_URL': '/rest-urls/login',
+#     'LOGOUT_URL': '/rest-urls/logout',
+# }
 
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'services.serializers_custom.LoginSerializer',

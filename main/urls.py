@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^', include('django.contrib.auth.urls')), #hotfix
     url(r'^', include('services.urls')),
 
-    url(r'^rest-urls/', include('rest_framework.urls', namespace='rest_framework')),
+    # url(r'^rest-urls/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^rest-urls/login/$', login, name='auth-login'),
 
     # url(r'^rest-urls/login/$', auth_views.login, {'template_name': 'rest_framework/login.html', 'authentication_form':RemoteLoginAwareLoginForm}, name='login'),
