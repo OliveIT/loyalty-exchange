@@ -7,13 +7,13 @@ from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from allauth.utils import (email_address_exists, get_username_max_length)
+from django.contrib.auth.forms import PasswordResetForm
 
 import phonenumbers
 
 UserModel = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
-    phone = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={'input_type': 'password'})
 
@@ -28,33 +28,7 @@ class LoginSerializer(serializers.Serializer):
 
         return user
 
-    def _validate_phone(self, phone, password):
-        user = None
-
-        if phone and password:
-            user = authenticate(username=phone, password=password)
-        else:
-            msg = _('Must include "phone" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        return user
-
-    def _validate_phone_email(self, phone, email, password):
-        if not phone and not email:
-            msg = _('Must include either "phone" or "email" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        user = None
-
-        if phone and password:
-            user = authenticate(username=phone, password=password)
-        if not user and email and password:
-            user = authenticate(username=email, password=password)
-
-        return user
-
     def validate(self, attrs):
-        phone = attrs.get('phone')
         email = attrs.get('email')
         password = attrs.get('password')
 
@@ -64,25 +38,13 @@ class LoginSerializer(serializers.Serializer):
             # Authentication through email
             if allauth_settings.AUTHENTICATION_METHOD == allauth_settings.AuthenticationMethod.EMAIL:
                 user = self._validate_email(email, password)
-
-            # Authentication through phone
-            elif allauth_settings.AUTHENTICATION_METHOD == allauth_settings.AuthenticationMethod.USERNAME:
-                user = self._validate_phone(phone, password)
-
-            # Authentication through either phone or email
-            else:
-                user = self._validate_phone_email(phone, email, password)
-
         else:
             # Authentication without using allauth
             if email:
                 try:
-                    phone = UserModel.objects.get(email__iexact=email).get_username()
+                    auser = UserModel.objects.get(email__iexact=email).get_username()
                 except UserModel.DoesNotExist:
                     pass
-
-            if phone:
-                user = self._validate_phone_email(phone, '', password)
 
         # Did we get back an active user?
         if user:
@@ -109,11 +71,11 @@ class CustomRegisterSerializer(serializers.Serializer):
     #     min_length=allauth_settings.USERNAME_MIN_LENGTH,
     #     required=allauth_settings.USERNAME_REQUIRED
     # )
-    phone = serializers.CharField(required=False)
     email = serializers.EmailField(required=True)
     # email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    phone = serializers.CharField(required=False)
     first_name = serializers.CharField(required = True, write_only=True)
     last_name = serializers.CharField(required = True, write_only=True)
 
@@ -168,3 +130,40 @@ class CustomRegisterSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
+
+
+class MyPasswordResetSerializer(serializers.Serializer):
+    """
+    Serializer for requesting a password reset e-mail.
+    """
+    email = serializers.EmailField()
+
+    password_reset_form_class = PasswordResetForm
+
+    def get_email_options(self):
+        """Override this method to change default e-mail options"""
+        return {}
+
+    def validate_email(self, value):
+        # Create PasswordResetForm with the serializer
+        self.reset_form = self.password_reset_form_class(data=self.initial_data)
+        if not self.reset_form.is_valid():
+            raise serializers.ValidationError(self.reset_form.errors)
+
+        return value
+
+    def save(self):
+        request = self.context.get('request')
+        # Set some values to trigger the send_email method.
+        opts = {
+            'use_https': request.is_secure(),
+            'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
+            'request': request,
+            ###### USE YOUR TEXT FILE ######
+            'email_template_name': 'account/email/password_reset_key_message.txt',
+            'subject_template_name': 'account/email/password_reset_key_subject.txt'
+        }
+        print('##########################################')
+
+        opts.update(self.get_email_options())
+        self.reset_form.save(**opts)

@@ -185,8 +185,8 @@ REST_SESSION_LOGIN = True
 
 SITE_ID = 1
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -197,6 +197,8 @@ EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = 'default@sender.com'
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
 
@@ -210,7 +212,8 @@ SWAGGER_SETTINGS = {
 
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'services.serializers_custom.LoginSerializer',
-    'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer'
+    'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer',
+    # 'PASSWORD_RESET_SERIALIZER': 'services.serializers_custom.MyPasswordResetSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
@@ -225,3 +228,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = '/'
+
+
+ACCOUNT_FORMS = {
+    'reset_password': 'services.forms.MyResetPasswordForm',
+}
