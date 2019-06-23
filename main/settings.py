@@ -200,7 +200,8 @@ EMAIL_USE_TLS = True
 
 DEFAULT_FROM_EMAIL = 'default@sender.com'
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
+# TODO:
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 
 # must enter old password to change password
 OLD_PASSWORD_FIELD_ENABLED = True
@@ -213,7 +214,7 @@ SWAGGER_SETTINGS = {
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'services.serializers_custom.LoginSerializer',
     'USER_DETAILS_SERIALIZER': 'services.serializers.UserSerializer',
-    # 'PASSWORD_RESET_SERIALIZER': 'services.serializers_custom.MyPasswordResetSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'services.serializers_custom.MyPasswordResetSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
@@ -228,8 +229,3 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = '/'
-
-
-ACCOUNT_FORMS = {
-    'reset_password': 'services.forms.MyResetPasswordForm',
-}

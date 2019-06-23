@@ -161,7 +161,7 @@ class MyPasswordResetSerializer(serializers.Serializer):
             'request': request,
             ###### USE YOUR TEXT FILE ######
             'email_template_name': 'account/email/password_reset_key_message.txt',
-            'subject_template_name': 'account/email/password_reset_key_subject.txt'
+            'subject_template_name': 'account/email/password_reset_key_subject.txt',
         }
         print('##########################################')
 

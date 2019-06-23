@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = MyUser
         fields = ('id', 'email', 'phone', 'first_name', 'last_name')
         # fields = UserDetailsSerializer.Meta.fields + ('phone', )
-        read_only_fields = ('email', 'phone',)
+        read_only_fields = ('email', )
 
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source='user.id')
@@ -20,6 +20,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     extra_data = serializers.DecimalField(max_digits=16, decimal_places=6)
     class Meta:
         model = UserProfile
-        fields = ('user_id', 'email', 'phone', 'extra_data')
-        read_only_fields = ('phone', )
+        fields = ('user_id', 'extra_data')
+        read_only_fields = ('user_id', )
         depth = 1
