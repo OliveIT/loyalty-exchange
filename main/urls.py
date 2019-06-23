@@ -9,6 +9,7 @@ from rest_framework_swagger.views import get_swagger_view
 
 from django.contrib.auth import views
 from django.contrib.auth import views as auth_views
+from services.views_custom import CustomObtainAuthToken
 
 API_TITLE = 'Loyalty Exchange API'
 API_DESCRIPTION = 'A Web API for Loyalty Exchange.'
@@ -37,6 +38,8 @@ urlpatterns = [
 # auth
     url(r'^auth/', include('rest_auth.urls')),
     url(r'^auth/registration/', include('rest_auth.registration.urls')),
+    url(r'^auth/api-token-auth/', CustomObtainAuthToken.as_view()),
+
     # url(r'^account/', include('allauth.urls')),
     # url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
 

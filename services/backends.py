@@ -9,10 +9,10 @@ class CustomAuthBackend(ModelBackend):
     # def authenticate(self, request, phone=None, email=None, password=None, **kwargs):
     def authenticate(self, request, username=None, password=None, **kwargs):
         user = None
-        try:
-            user = UserModel.objects.get(phone=username)
-        except UserModel.DoesNotExist:
-            pass
+        # try:
+        #     user = UserModel.objects.get(phone=username)
+        # except UserModel.DoesNotExist:
+        #     pass
 
         try:
             user = UserModel.objects.get(email=username)
